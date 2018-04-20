@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerActivity extends AppCompatActivity {
+    public static final String CONTROLLEUR = "https://apptouristprojetint.000webhostapp.com/PHP/activityControleurJSON.php";
+    public static final String CONTROLLEUR_LOCAL = "http://10.0.2.2:8888/ProjetFinal/PHP/activityControleurJSON.php";
     public static final String SERVICE = "com.example.lspoulin.montrealapp.ServerActivity.service";
 
     public static final String SERVICE_LIST_LANDMARK = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmark";
@@ -227,7 +229,7 @@ public class ServerActivity extends AppCompatActivity {
     }
 
     private String getController() {
-        return "http://10.0.2.2:8888/ProjetFinal/PHP/activityControleurJSON.php";
+        return CONTROLLEUR;
     }
 
 
