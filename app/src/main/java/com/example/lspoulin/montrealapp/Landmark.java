@@ -21,6 +21,16 @@ public class Landmark implements Serializable, Parcelable {
     //TODO : add tumbnail and normal images
     private float price;
 
+    public float getDistanceKM() {
+        return distanceKM;
+    }
+
+    public void setDistanceKM(float distanceKM) {
+        this.distanceKM = distanceKM;
+    }
+
+    private float distanceKM;
+
     public int getId() {
         return id;
     }
@@ -90,7 +100,7 @@ public class Landmark implements Serializable, Parcelable {
     }
 
     public Landmark(int id, String title, String description, String address, float latitude, float longitude,
-                    String url, float price){
+                    String url, float price, float distanceKM){
         this.id = id;
         this.title = title;
         this.description = description;
@@ -99,6 +109,7 @@ public class Landmark implements Serializable, Parcelable {
         this.longitude = longitude;
         this.url = url;
         this.price = price;
+        this.distanceKM = distanceKM;
     }
 
     @Override
@@ -116,6 +127,7 @@ public class Landmark implements Serializable, Parcelable {
         parcel.writeFloat(longitude);
         parcel.writeString(url);
         parcel.writeFloat(price);
+        parcel.writeFloat(distanceKM);
 
     }
 
@@ -132,6 +144,7 @@ public class Landmark implements Serializable, Parcelable {
             landmark.setLongitude(parcel.readFloat());
             landmark.setUrl(parcel.readString());
             landmark.setPrice(parcel.readFloat());
+            landmark.setDistanceKM(parcel.readFloat());
 
             return landmark;
         }

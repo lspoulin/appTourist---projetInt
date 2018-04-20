@@ -1,9 +1,18 @@
 package com.example.lspoulin.montrealapp;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -24,36 +33,135 @@ public class ServerActivity extends AppCompatActivity {
     public static final String SERVICE = "com.example.lspoulin.montrealapp.ServerActivity.service";
     public static final String SERVICE_LIST_LANDMARK = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmark";
     public static final String SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmarkorderbydistance";
+    public static final String LANDMARK_LIST = "com.example.lspoulin.montrealapp.ServerActivity.service.listactivity";
+
     public static final String SERVICE_LOGIN = "com.example.lspoulin.montrealapp.ServerActivity.service.login";
     public static final String PARAM_LOGIN_USER = "com.example.lspoulin.montrealapp.ServerActivity.service.loginuser";
     public static final String PARAM_LOGIN_PASSWORD = "com.example.lspoulin.montrealapp.ServerActivity.service.loginpassword";
-    public static final String LANDMARK_LIST = "com.example.lspoulin.montrealapp.ServerActivity.service.listactivity";
 
-    private String respondTo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        String dataTransmited=intent.getStringExtra(SERVICE);
-        switch (dataTransmited){
-            case SERVICE_LIST_LANDMARK:
-                listLandmark();
-                break;
-            case SERVICE_LOGIN:
-                String user=intent.getStringExtra(PARAM_LOGIN_USER);
-                String password=intent.getStringExtra(PARAM_LOGIN_PASSWORD);
-                login(user, password);
-                break;
-            case SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE:
-                listLandmark();
-            default:
-                resultNotOk();
-                break;
-        }
+        String dataTransmited = intent.getStringExtra(SERVICE);
+        if (dataTransmited != null)
+            switch (dataTransmited) {
+                case SERVICE_LIST_LANDMARK:
+                    listerLandmark();
+                    break;
+                case SERVICE_LOGIN:
+                    String user = intent.getStringExtra(PARAM_LOGIN_USER);
+                    String password = intent.getStringExtra(PARAM_LOGIN_PASSWORD);
+                    login(user, password);
+                    break;
+                case SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE:
+                    attemptToGPS();
+                    break;
+                default:
+                    resultNotOk();
+                    break;
+            }
+        else
+            resultNotOk();
 
 
     }
+
+    private void attemptToGPS() {
+
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        listerLandmarkByDistance(45.5519, -73.6431);//coordonnee du college ahuntsic
+
+        /*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                resultNotOk();
+            return;
+        }
+        locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER, 5000, 10, new LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                        listerLandmarkByDistance(location.getLatitude(), location.getLongitude());
+
+                    }
+
+                    @Override
+                    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String s) {
+
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String s) {
+
+                    }
+                });*/
+    }
+
+    private void listerLandmarkByDistance(final double latitude, final double longitude) {
+        StringRequest requete = new StringRequest(Request.Method.POST, getController(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                JSONObject unLandmark;
+                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
+                                for(i=1;i<jsonResponse.length();i++){
+                                    unLandmark=jsonResponse.getJSONObject(i);
+                                    Landmark l = new Landmark(unLandmark.getInt("id"),
+                                            unLandmark.getString("title"),
+                                            unLandmark.getString("description"),
+                                            unLandmark.getString("address"),
+                                            (float)unLandmark.getDouble("latitude"),
+                                            (float) unLandmark.getDouble("longitude"),
+                                            unLandmark.getString("url"),
+                                            (float)unLandmark.getDouble("price"),
+                                            (float)unLandmark.getDouble("distanceKM")
+                                    );
+                                    landmarks.add(l);
+                                }
+                                Intent result = new Intent();
+                                result.putParcelableArrayListExtra(ServerActivity.LANDMARK_LIST, landmarks);
+                                resultOk(result);
+                            }
+                            else{
+                                resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            resultNotOk();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        resultNotOk();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les parametres pour POST
+                params.put("action", "listerParDistance");
+                params.put("latitude", latitude+"");
+                params.put("longitude", longitude+"");
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
+    }
+
 
     public void listerLandmark() {
         StringRequest requete = new StringRequest(Request.Method.POST, getController(),
@@ -77,7 +185,8 @@ public class ServerActivity extends AppCompatActivity {
                                             (float)unLandmark.getDouble("latitude"),
                                             (float) unLandmark.getDouble("longitude"),
                                             unLandmark.getString("url"),
-                                            (float)unLandmark.getDouble("price")
+                                            (float)unLandmark.getDouble("price"),
+                                            (float)unLandmark.getDouble("distanceKM")
                                     );
                                     landmarks.add(l);
                                 }
@@ -113,7 +222,7 @@ public class ServerActivity extends AppCompatActivity {
     }
 
     private String getController() {
-        return "http://10.0.2.2:8888/ProjetFinal/PHP/landmarksControleurJSON.php";
+        return "http://10.0.2.2:8888/ProjetFinal/PHP/activityControleurJSON.php";
     }
 
 
@@ -131,7 +240,8 @@ public class ServerActivity extends AppCompatActivity {
                 45.5546f,
                 -73.5243f,
                 "http://parcolympique.qc.ca",
-                0.0f
+                0.0f,
+                1.0f
         ));
 
         result.putParcelableArrayListExtra(this.LANDMARK_LIST, landmarkList);
@@ -173,4 +283,5 @@ public class ServerActivity extends AppCompatActivity {
             listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
         }
     }*/
-}
+
+    }

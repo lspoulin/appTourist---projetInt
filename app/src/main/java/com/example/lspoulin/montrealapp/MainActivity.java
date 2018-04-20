@@ -27,10 +27,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Ajouter ce code a l'endroit ou vous appellez le service (dans le onCreate par exemple)
         Intent i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE);
         startActivityForResult(i, CODE);
-
-
     }
 
     @Override
@@ -40,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
             String output = "";
             for (Landmark l : listerLandmark){
-                output += l.getTitle() + "\n";
+                output += l.getTitle() + " " + l.getDistanceKM()+ "km\n";
             }
-            Toast.makeText(this, output, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, output.substring(0, output.length()-1), Toast.LENGTH_LONG).show();
         }
     }
 
