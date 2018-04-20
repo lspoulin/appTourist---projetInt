@@ -15,7 +15,8 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int CODE = 10001;
+    public static final int CODE_LIST_LANDMARK = 10001;
+    public static final int CODE_LOGIN = 10002;
 
 
     @Override
@@ -27,19 +28,29 @@ public class MainActivity extends AppCompatActivity {
 
         Intent i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK);
-        startActivityForResult(i, CODE);
+        startActivityForResult(i, CODE_LIST_LANDMARK);
+
+        i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN_DUMMY_DATA);
+        i.putExtra(ServerActivity.PARAM_LOGIN_USER,"root" );
+        i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, "pass");
+        startActivityForResult(i, CODE_LOGIN);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        if(requestCode == CODE && resultCode == ServerActivity.RESULT_OK){
+        if(requestCode == CODE_LIST_LANDMARK && resultCode == ServerActivity.RESULT_OK){
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
             String output = "";
             for (Landmark l : listerLandmark){
                 output += l.getTitle() + " " + l.getDistanceKM()+ "km\n";
             }
             Toast.makeText(this, output.substring(0, output.length()-1), Toast.LENGTH_LONG).show();
+        }
+
+        if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_OK){
+            Toast.makeText(this, "Login successful", Toast.LENGTH_LONG).show();
         }
     }
 

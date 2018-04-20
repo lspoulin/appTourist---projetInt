@@ -32,6 +32,7 @@ import java.util.Map;
 public class ServerActivity extends AppCompatActivity {
     public static final String CONTROLLEUR = "https://apptouristprojetint.000webhostapp.com/PHP/activityControleurJSON.php";
     public static final String CONTROLLEUR_LOCAL = "http://10.0.2.2:8888/ProjetFinal/PHP/activityControleurJSON.php";
+
     public static final String SERVICE = "com.example.lspoulin.montrealapp.ServerActivity.service";
 
     public static final String SERVICE_LIST_LANDMARK = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmark";
@@ -40,6 +41,7 @@ public class ServerActivity extends AppCompatActivity {
     public static final String LANDMARK_LIST = "com.example.lspoulin.montrealapp.ServerActivity.service.listactivity";
 
     public static final String SERVICE_LOGIN = "com.example.lspoulin.montrealapp.ServerActivity.service.login";
+    public static final String SERVICE_LOGIN_DUMMY_DATA = "com.example.lspoulin.montrealapp.ServerActivity.service.logindummydata";
     public static final String PARAM_LOGIN_USER = "com.example.lspoulin.montrealapp.ServerActivity.service.loginuser";
     public static final String PARAM_LOGIN_PASSWORD = "com.example.lspoulin.montrealapp.ServerActivity.service.loginpassword";
 
@@ -57,10 +59,10 @@ public class ServerActivity extends AppCompatActivity {
                 case SERVICE_LIST_LANDMARK:
                     listerLandmark();
                     break;
-                case SERVICE_LOGIN:
+                case SERVICE_LOGIN_DUMMY_DATA:
                     String user = intent.getStringExtra(PARAM_LOGIN_USER);
                     String password = intent.getStringExtra(PARAM_LOGIN_PASSWORD);
-                    login(user, password);
+                    loginDummy(user, password);
                     break;
                 case SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE:
                     attemptToGPS();
@@ -255,8 +257,8 @@ public class ServerActivity extends AppCompatActivity {
         resultOk(result);
     }
 
-    private void login(String user, String password){
-        if (user.equals("root") && user.equals("pass")){
+    private void loginDummy(String user, String password){
+        if (user.equals("root") && password.equals("pass")){
             resultOk(new Intent());
         }
         else
