@@ -1,0 +1,45 @@
+<html>
+	<head>
+	  <script language="javascript" src="JS/monJS.js"></script>
+	</head>
+	<body>
+	<input type="button" value="Enregistrer(C)" onClick="montrer('divEnreg');">
+	<input type="button" value="Lister(R)" onClick="envoyerLister();">
+	<input type="button" value="Modifier(U)" onClick="montrer('divModifier');">
+	<input type="button" value="Enlever(D)" onClick="montrer('divEnlever');">
+	<div id="divEnreg" style="display:none;position:absolute;top:20%;left:40%">
+		<form id="formEnreg" action="PHP/livresControleur.php" method="post">
+		   <h3>Enregistrer un livre</h3><br>
+		   <input type="text" name="titre" id="titre"><br>
+		   <input type="text" name="auteur" id="auteur"><br>
+		   <input type="text" name="annee" id="annee"><br>
+		   <input type="text" name="pages" id="pages"><br>
+		   <input type="hidden" name="action" value="enregistrer"><br>
+		   <input type="button" value="Envoyer" onClick="envoyerEnreg();">
+		   <input type="reset" value="Vider">
+		   <input type="button" value="Cacher" onClick="cacher('divEnreg');">
+		</form>
+	</div>
+	<form id="formLister" action="PHP/clientsControleurJSON.php" method="post">
+	<input type="hidden" name="action" value="lister"><br>
+	</form>
+	<div id="divEnlever" style="display:none;position:absolute;top:20%;left:40%">
+		<form id="formEnlever" action="PHP/livresControleur.php" method="post">
+		   <input type="text" name="idlivre" id="idlivre"><br>
+		   <input type="hidden" name="action" value="enlever"><br>
+		   <input type="button" value="Envoyer" onClick="envoyerEnlever();">
+		   <input type="reset" value="Vider">
+		   <input type="button" value="Cacher" onClick="cacher('divEnlever');">
+		</form>
+	</div>
+	<div id="divModifier" style="display:none;position:absolute;top:20%;left:40%">
+		<form id="formModifier" action="PHP/livresControleur.php" method="post">
+		   <input type="text" name="idlivre" id="idlivre"><br>
+		   <input type="hidden" name="action" value="modifier"><br>
+		   <input type="button" value="Envoyer" onClick="envoyerModifier();">
+		   <input type="reset" value="Vider">
+		   <input type="button" value="Cacher" onClick="cacher('divModifier');">
+		</form>
+	</div>
+	</body>
+</html>
