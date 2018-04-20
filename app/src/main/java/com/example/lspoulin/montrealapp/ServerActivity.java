@@ -3,14 +3,30 @@ package com.example.lspoulin.montrealapp;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerActivity extends AppCompatActivity {
-    public static final String RESPONSETO = "The Activity that called me!";
     public static final String SERVICE = "com.example.lspoulin.montrealapp.ServerActivity.service";
     public static final String SERVICE_LIST_LANDMARK = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmark";
+    public static final String SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmarkorderbydistance";
+    public static final String SERVICE_LOGIN = "com.example.lspoulin.montrealapp.ServerActivity.service.login";
+    public static final String PARAM_LOGIN_USER = "com.example.lspoulin.montrealapp.ServerActivity.service.loginuser";
+    public static final String PARAM_LOGIN_PASSWORD = "com.example.lspoulin.montrealapp.ServerActivity.service.loginpassword";
     public static final String LANDMARK_LIST = "com.example.lspoulin.montrealapp.ServerActivity.service.listactivity";
 
     private String respondTo;
@@ -22,14 +38,86 @@ public class ServerActivity extends AppCompatActivity {
         String dataTransmited=intent.getStringExtra(SERVICE);
         switch (dataTransmited){
             case SERVICE_LIST_LANDMARK:
-                listActivity();
+                listLandmark();
+                break;
+            case SERVICE_LOGIN:
+                String user=intent.getStringExtra(PARAM_LOGIN_USER);
+                String password=intent.getStringExtra(PARAM_LOGIN_PASSWORD);
+                login(user, password);
+                break;
+            case SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE:
+                listLandmark();
             default:
+                resultNotOk();
+                break;
         }
 
 
     }
 
-    private void listActivity() {
+    public void listerLandmark() {
+        StringRequest requete = new StringRequest(Request.Method.POST, getController(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                JSONObject unLandmark;
+                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
+                                for(i=1;i<jsonResponse.length();i++){
+                                    unLandmark=jsonResponse.getJSONObject(i);
+                                    Landmark l = new Landmark(unLandmark.getInt("id"),
+                                            unLandmark.getString("title"),
+                                            unLandmark.getString("description"),
+                                            unLandmark.getString("address"),
+                                            (float)unLandmark.getDouble("latitude"),
+                                            (float) unLandmark.getDouble("longitude"),
+                                            unLandmark.getString("url"),
+                                            (float)unLandmark.getDouble("price")
+                                    );
+                                    landmarks.add(l);
+                                }
+                                Intent result = new Intent();
+                                result.putParcelableArrayListExtra(ServerActivity.LANDMARK_LIST, landmarks);
+                                resultOk(result);
+                            }
+                            else{
+                                resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            resultNotOk();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        resultNotOk();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les parametres pour POST
+                params.put("action", "lister");
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
+    }
+
+    private String getController() {
+        return "http://10.0.2.2:8888/ProjetFinal/PHP/landmarksControleurJSON.php";
+    }
+
+
+    private void listLandmark() {
         Intent result = new Intent();
 
         ArrayList<Landmark> landmarkList = new ArrayList<Landmark>();
@@ -47,7 +135,42 @@ public class ServerActivity extends AppCompatActivity {
         ));
 
         result.putParcelableArrayListExtra(this.LANDMARK_LIST, landmarkList);
+        resultOk(result);
+    }
+
+    private void login(String user, String password){
+        if (user.equals("root") && user.equals("pass")){
+            resultOk(new Intent());
+        }
+        else
+            resultNotOk();
+    }
+
+    private void resultNotOk(){
+        Intent intent = new Intent();
+        setResult(RESULT_CANCELED, intent);
+        ServerActivity.this.finish();
+    }
+
+    private void resultOk(Intent result){
         setResult(RESULT_OK, result);
         ServerActivity.this.finish();
     }
+    /*
+    //AJouter ce code pour faire fonctionner l'appel a la classe ServerActivity
+    public static final int CODE = 10001;
+
+    //Ajouter ce code a l'endroit ou vous appellez le service (dans le onCreate par exemple)
+        Intent i  = new Intent(MainActivity.this, ServerActivity.class); //Remplacer MainActivity.this avec le nom de la classe
+        startActivityForResult(i, CODE);
+
+
+    //Ajouter ce code pour traiter l'information une fois qu'elle est recu
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if(requestCode == CODE && resultCode == ServerActivity.RESULT_OK){
+            listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
+        }
+    }*/
 }
