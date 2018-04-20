@@ -31,7 +31,9 @@ import java.util.Map;
 
 public class ServerActivity extends AppCompatActivity {
     public static final String SERVICE = "com.example.lspoulin.montrealapp.ServerActivity.service";
+
     public static final String SERVICE_LIST_LANDMARK = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmark";
+    public static final String SERVICE_LIST_LANDMARK_DUMMY_DATA = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmarkdummydata";
     public static final String SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmarkorderbydistance";
     public static final String LANDMARK_LIST = "com.example.lspoulin.montrealapp.ServerActivity.service.listactivity";
 
@@ -47,6 +49,9 @@ public class ServerActivity extends AppCompatActivity {
         String dataTransmited = intent.getStringExtra(SERVICE);
         if (dataTransmited != null)
             switch (dataTransmited) {
+                case SERVICE_LIST_LANDMARK_DUMMY_DATA:
+                    listLandmark();
+                    break;
                 case SERVICE_LIST_LANDMARK:
                     listerLandmark();
                     break;

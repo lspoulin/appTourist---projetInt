@@ -24,10 +24,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //Ajouter ce code a l'endroit ou vous appellez le service (dans le onCreate par exemple)
+        
         Intent i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_DUMMY_DATA);
         startActivityForResult(i, CODE);
     }
 
