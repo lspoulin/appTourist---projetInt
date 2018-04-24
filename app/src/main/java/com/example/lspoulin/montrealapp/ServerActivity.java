@@ -433,31 +433,18 @@ public class ServerActivity extends AppCompatActivity {
     }
 
     private void resultNotOk(){
-        Intent intent = new Intent();
-        setResult(RESULT_CANCELED, intent);
+        Intent result = new Intent();
+        setResult(RESULT_CANCELED, result);
+        result.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         ServerActivity.this.finish();
+        overridePendingTransition(0, 0);
     }
 
     private void resultOk(Intent result){
         setResult(RESULT_OK, result);
+        result.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         ServerActivity.this.finish();
+        overridePendingTransition(0, 0);
     }
-    /*
-    //AJouter ce code pour faire fonctionner l'appel a la classe ServerActivity
-    public static final int CODE = 10001;
 
-    //Ajouter ce code a l'endroit ou vous appellez le service (dans le onCreate par exemple)
-        Intent i  = new Intent(MainActivity.this, ServerActivity.class); //Remplacer MainActivity.this avec le nom de la classe
-        startActivityForResult(i, CODE);
-
-
-    //Ajouter ce code pour traiter l'information une fois qu'elle est recu
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        if(requestCode == CODE && resultCode == ServerActivity.RESULT_OK){
-            listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
-        }
-    }*/
-
-    }
+}
