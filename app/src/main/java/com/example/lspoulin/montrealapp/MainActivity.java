@@ -1,6 +1,8 @@
 package com.example.lspoulin.montrealapp;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,7 +12,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -52,10 +56,48 @@ public class MainActivity extends AppCompatActivity {
         i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, "pass");
         startActivityForResult(i, CODE_LOGIN);
 
-        i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_GET_LANDMARK);
-        i.putExtra(ServerActivity.PARAM_LANDMARK_ID,1 );
-        startActivityForResult(i, CODE_GET_LANDMARK);
+        mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i  = new Intent(MainActivity.this, ServerActivity.class);
+                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_GET_LANDMARK);
+                i.putExtra(ServerActivity.PARAM_LANDMARK_ID,landmarkList.get(position).getId() );
+                startActivityForResult(i, CODE_GET_LANDMARK);
+
+            }
+        });
+    }
+
+    private void showLandmark(final Landmark landmark) {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.showlandmark);
+        dialog.setTitle(landmark.getTitle());
+
+        // set the custom dialog components - text, image and button
+        final TextView title = (TextView) dialog.findViewById(R.id.title);
+        final TextView description = (TextView) dialog.findViewById(R.id.description);
+        final TextView address = (TextView) dialog.findViewById(R.id.address);
+        final ImageView imageView = (ImageView) dialog.findViewById(R.id.imageView);
+        final Button webbutton = (Button) dialog.findViewById(R.id.buttonWeb);
+
+        imageView.setImageDrawable(landmark.getImage());
+
+        title.setText(landmark.getTitle());
+        description.setText(landmark.getDescription());
+        address.setText(landmark.getAddress());
+
+        webbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = landmark.getUrl();
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
+        dialog.show();
+
     }
 
     @Override
@@ -73,11 +115,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(requestCode == CODE_GET_LANDMARK && resultCode == ServerActivity.RESULT_OK){
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
-            String output = "";
-            for (Landmark l : listerLandmark){
-                output += l.getTitle();
-            }
-            Toast.makeText(this, output.substring(0, output.length()-1), Toast.LENGTH_LONG).show();
+            showLandmark(listerLandmark.get(0));
         }
 
 

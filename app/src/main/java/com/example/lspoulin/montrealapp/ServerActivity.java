@@ -92,8 +92,6 @@ public class ServerActivity extends AppCompatActivity {
             }
         else
             resultNotOk();
-
-
     }
 
     private void getLandmark() {
