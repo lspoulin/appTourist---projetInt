@@ -1,5 +1,6 @@
 <?php
  require_once("../BD/connexion.inc.php");
+ 
  $tab=array();
  function enregistrer(){
 	global $connexion,$tab;
@@ -23,6 +24,7 @@
 
  function listerParDistance(){
 	 global $connexion,$tab;
+	 $photo_dir="../photos/";
 	 $latitude=$_POST['latitude'];
 	 $longitude=$_POST['longitude'];
 	 $requete="SELECT *, 111.111 *
@@ -48,7 +50,7 @@
 			$tab[$i]['url']=$ligne['url'];
 			$tab[$i]['price']=$ligne['price'];
 			$tab[$i]['distanceKM']=$ligne['distance_in_km'];
-			
+			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir .$ligne['image']."_small.jpg"));
 			$i++;
 		 }
 	 }catch (Exception $e){
@@ -60,6 +62,7 @@
 
  function lister(){
 	 global $connexion,$tab;
+	 $photo_dir="../photos/";
 	 $requete="SELECT * FROM activity";
 	 try{
 		 $stmt = $connexion->prepare($requete);
@@ -77,7 +80,38 @@
 			$tab[$i]['url']=$ligne['url'];
 			$tab[$i]['price']=$ligne['price'];
 			$tab[$i]['distanceKM']='0.0';
-			
+			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir .$ligne['image']."_small.jpg"));
+			$i++;
+		 }
+	 }catch (Exception $e){
+		 $tab[0]="NOK";
+	 }finally {
+		echo json_encode($tab);
+	 }
+ }
+
+ function listerParId(){
+	 global $connexion,$tab;
+	$photo_dir="../photos/";
+	 $id = $_POST['id'];
+	 $requete="SELECT * FROM activity WHERE id=?";
+	 try{
+		 $stmt = $connexion->prepare($requete);
+		 $stmt->execute(array($id));
+		 $tab[0]="OK";
+		 $i=1;
+		 while($ligne=$stmt->fetch(PDO::FETCH_ASSOC)){
+			$tab[$i]=array();
+			$tab[$i]['id']=$ligne['id'];
+			$tab[$i]['title']=$ligne['title'];
+			$tab[$i]['description']=$ligne['description'];
+			$tab[$i]['address']=$ligne['address'];
+			$tab[$i]['longitude']=$ligne['longitude'];
+			$tab[$i]['latitude']=$ligne['latitude'];
+			$tab[$i]['url']=$ligne['url'];
+			$tab[$i]['price']=$ligne['price'];
+			$tab[$i]['distanceKM']='0.0';
+			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir . $ligne['image'].".jpg"));
 			$i++;
 		 }
 	 }catch (Exception $e){
@@ -146,10 +180,15 @@
  
  //Le controleur
  $action=$_POST['action'];
+
+
  switch($action){
 	case "enregistrer":
 	   enregistrer();
 	   break;
+	case "listerParId":
+		listerParId();
+		break;
 	case "lister":
 		lister();
 		break;

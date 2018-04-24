@@ -4,6 +4,10 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,6 +15,7 @@ import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -30,8 +35,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerActivity extends AppCompatActivity {
-    public static final String CONTROLLEUR = "https://apptouristprojetint.000webhostapp.com/PHP/activityControleurJSON.php";
-    public static final String CONTROLLEUR_LOCAL = "http://10.0.2.2:8888/ProjetFinal/PHP/activityControleurJSON.php";
+    public static final boolean LOCAL_SERVER = false;
+    public static final String CONTROLLEUR_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/PHP/";
+    public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "activityControleurJSON.php";
+
+    public static final String CONTROLLEUR_LOCAL_ENTRY_POINT = "http://10.0.2.2:8888/ProjetFinal/PHP/";
 
     public static final String SERVICE = "com.example.lspoulin.montrealapp.ServerActivity.service";
 
@@ -112,7 +120,7 @@ public class ServerActivity extends AppCompatActivity {
     }
 
     private void listerLandmarkByDistance(final double latitude, final double longitude) {
-        StringRequest requete = new StringRequest(Request.Method.POST, getController(),
+        StringRequest requete = new StringRequest(Request.Method.POST, getControllerLandmark(),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -134,7 +142,8 @@ public class ServerActivity extends AppCompatActivity {
                                             (float) unLandmark.getDouble("longitude"),
                                             unLandmark.getString("url"),
                                             (float)unLandmark.getDouble("price"),
-                                            (float)unLandmark.getDouble("distanceKM")
+                                            (float)unLandmark.getDouble("distanceKM"),
+                                            getDrawableBitmapFromJSON(unLandmark.getString("image"))
                                     );
                                     landmarks.add(l);
                                 }
@@ -171,9 +180,16 @@ public class ServerActivity extends AppCompatActivity {
         Volley.newRequestQueue(this).add(requete);
     }
 
+    public Drawable getDrawableBitmapFromJSON(String encodedImage){
+        byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        Drawable d = new BitmapDrawable(getResources(),decodedByte);
+        return d;
+    }
+
 
     public void listerLandmark() {
-        StringRequest requete = new StringRequest(Request.Method.POST, getController(),
+        StringRequest requete = new StringRequest(Request.Method.POST, getControllerLandmark(),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -187,6 +203,7 @@ public class ServerActivity extends AppCompatActivity {
                                 ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
                                 for(i=1;i<jsonResponse.length();i++){
                                     unLandmark=jsonResponse.getJSONObject(i);
+
                                     Landmark l = new Landmark(unLandmark.getInt("id"),
                                             unLandmark.getString("title"),
                                             unLandmark.getString("description"),
@@ -195,8 +212,8 @@ public class ServerActivity extends AppCompatActivity {
                                             (float) unLandmark.getDouble("longitude"),
                                             unLandmark.getString("url"),
                                             (float)unLandmark.getDouble("price"),
-                                            (float)unLandmark.getDouble("distanceKM")
-                                    );
+                                            (float)unLandmark.getDouble("distanceKM"),
+                                            getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                     landmarks.add(l);
                                 }
                                 Intent result = new Intent();
@@ -230,8 +247,11 @@ public class ServerActivity extends AppCompatActivity {
         Volley.newRequestQueue(this).add(requete);
     }
 
-    private String getController() {
-        return CONTROLLEUR;
+    private String getControllerLandmark() {
+        if (LOCAL_SERVER)
+            return CONTROLLEUR_LOCAL_ENTRY_POINT + CONTROLLEUR_LANDMARK_ENDPOINT;
+        else
+            return CONTROLLEUR_ENTRY_POINT + CONTROLLEUR_LANDMARK_ENDPOINT;
     }
 
 
@@ -250,7 +270,8 @@ public class ServerActivity extends AppCompatActivity {
                 -73.5243f,
                 "http://parcolympique.qc.ca",
                 0.0f,
-                1.0f
+                1.0f,
+                null
         ));
 
         result.putParcelableArrayListExtra(this.LANDMARK_LIST, landmarkList);
