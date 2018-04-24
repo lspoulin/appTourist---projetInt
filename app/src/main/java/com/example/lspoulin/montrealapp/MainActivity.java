@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int CODE_LIST_LANDMARK = 10001;
     public static final int CODE_LOGIN = 10002;
     public static final int CODE_GET_LANDMARK = 10003;
+    public static final int CODE_LIST_LANDMARK_WITH_TAGS = 10004;
 
     private List<Landmark> landmarkList;
     private ListView mainListView;
@@ -48,13 +49,18 @@ public class MainActivity extends AppCompatActivity {
 
         Intent i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK);
-        startActivityForResult(i, CODE_LIST_LANDMARK);
+        //startActivityForResult(i, CODE_LIST_LANDMARK);
 
         i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN_DUMMY_DATA);
         i.putExtra(ServerActivity.PARAM_LOGIN_USER,"root" );
         i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, "pass");
         startActivityForResult(i, CODE_LOGIN);
+
+        i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_WITH_TAGS);
+        i.putExtra(ServerActivity.PARAM_LANDMARK_TAGS,"sport,family" );
+        startActivityForResult(i, CODE_LIST_LANDMARK_WITH_TAGS);
 
         mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
@@ -105,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, intent);
         if(requestCode == CODE_LIST_LANDMARK && resultCode == ServerActivity.RESULT_OK){
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
-            String output = "";
+
             landmarkList = listerLandmark;
             customAdapter.notifyDataSetChanged();
         }
@@ -116,6 +122,12 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode == CODE_GET_LANDMARK && resultCode == ServerActivity.RESULT_OK){
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
             showLandmark(listerLandmark.get(0));
+        }
+        if(requestCode == CODE_LIST_LANDMARK_WITH_TAGS && resultCode == ServerActivity.RESULT_OK){
+            ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
+
+            landmarkList = listerLandmark;
+            customAdapter.notifyDataSetChanged();
         }
 
 

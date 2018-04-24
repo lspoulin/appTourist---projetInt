@@ -29,7 +29,7 @@ public class Landmark implements Serializable, Parcelable {
     }
 
     public void setImage(Drawable drawable) {
-        this.image = title + new Random().nextLong();
+        this.image = id + "";
         DrawableManager.getInstance().addDrawable(this.image, drawable);
 
     }
@@ -170,9 +170,6 @@ public class Landmark implements Serializable, Parcelable {
             landmark.setPrice(parcel.readFloat());
             landmark.setDistanceKM(parcel.readFloat());
             landmark.setImage(parcel.readString());
-            //Bitmap bitmap = (Bitmap)parcel.readParcelable(getClass().getClassLoader());
-            // Convert Bitmap to Drawable:
-            //landmark.setImage(new BitmapDrawable(bitmap));
 
             return landmark;
         }

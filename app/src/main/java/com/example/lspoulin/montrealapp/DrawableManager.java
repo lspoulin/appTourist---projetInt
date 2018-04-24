@@ -26,6 +26,11 @@ public class DrawableManager {
     }
 
     public void addDrawable(String key, Drawable drawable){
-        drawablelist.put(key, drawable);
+        if (drawablelist.containsKey(key)){
+            drawablelist.remove(key);
+            drawablelist.put(key, drawable);
+        }
+        else
+            drawablelist.put(key, drawable);
     }
 }

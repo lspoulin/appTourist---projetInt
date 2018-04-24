@@ -45,7 +45,10 @@ public class ServerActivity extends AppCompatActivity {
     public static final String SERVICE_LIST_LANDMARK = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmark";
     public static final String SERVICE_LIST_LANDMARK_DUMMY_DATA = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmarkdummydata";
     public static final String SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmarkorderbydistance";
+    public static final String SERVICE_LIST_LANDMARK_WITH_TAGS = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmarkwithtags";
     public static final String LANDMARK_LIST = "com.example.lspoulin.montrealapp.ServerActivity.service.listactivity";
+    public static final String PARAM_LANDMARK_TAGS = "com.example.lspoulin.montrealapp.ServerActivity.service.paramlandmartags";
+
 
     public static final String SERVICE_GET_LANDMARK = "com.example.lspoulin.montrealapp.ServerActivity.service.getlandmark";
     public static final String SERVICE_GET_LANDMARK_DUMMY_DATA = "com.example.lspoulin.montrealapp.ServerActivity.service.getlandmarkdummydata";
@@ -86,6 +89,10 @@ public class ServerActivity extends AppCompatActivity {
                 case SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE:
                     attemptToGPS();
                     break;
+                case SERVICE_LIST_LANDMARK_WITH_TAGS:
+                    String tags = intent.getStringExtra(PARAM_LANDMARK_TAGS);
+                    listerLandmarkWithTags(tags);
+                    break;
                 default:
                     resultNotOk();
                     break;
@@ -93,6 +100,68 @@ public class ServerActivity extends AppCompatActivity {
         else
             resultNotOk();
     }
+
+    private void listerLandmarkWithTags(final String tags) {
+            StringRequest requete = new StringRequest(Request.Method.POST, getControllerLandmark(),
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                Log.d("RESULTAT", response);
+                                int i;
+                                JSONArray jsonResponse = new JSONArray(response);
+                                String msg = jsonResponse.getString(0);
+                                if(msg.equals("OK")){
+                                    JSONObject unLandmark;
+                                    ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
+                                    for(i=1;i<jsonResponse.length();i++){
+                                        unLandmark=jsonResponse.getJSONObject(i);
+
+                                        Landmark l = new Landmark(unLandmark.getInt("id"),
+                                                unLandmark.getString("title"),
+                                                unLandmark.getString("description"),
+                                                unLandmark.getString("address"),
+                                                (float)unLandmark.getDouble("latitude"),
+                                                (float) unLandmark.getDouble("longitude"),
+                                                unLandmark.getString("url"),
+                                                (float)unLandmark.getDouble("price"),
+                                                (float)unLandmark.getDouble("distanceKM"),
+                                                "");
+                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        landmarks.add(l);
+                                    }
+                                    Intent result = new Intent();
+                                    result.putParcelableArrayListExtra(ServerActivity.LANDMARK_LIST, landmarks);
+                                    resultOk(result);
+                                }
+                                else{
+                                    resultNotOk();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                resultNotOk();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            resultNotOk();
+                        }
+                    }
+            ) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    // Les parametres pour POST
+                    params.put("action", "listerAvecTags");
+                    params.put("tags", tags);
+                    return params;
+                }
+            };
+            Volley.newRequestQueue(this).add(requete);
+        }
+
 
     private void getLandmark() {
         listLandmark();

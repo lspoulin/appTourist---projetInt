@@ -90,6 +90,47 @@
 	 }
  }
 
+function listerAvecTags(){
+	 global $connexion,$tab;
+	 $tags = $_POST['tags'];
+	 $tagsarray=explode(",",$tags);
+	 $photo_dir="../photos/";
+	 $requete="SELECT * FROM activity";
+
+	 $length = count($tagsarray);
+	for ($i = 0; $i < $length; $i++) {
+		if ($i == 0)
+			$requete=$requete." WHERE INSTR(tags, ?)>0";
+		else 
+			$requete=$requete." AND INSTR(tags, ?)>0";
+	}
+
+	 try{
+		 $stmt = $connexion->prepare($requete);
+		 $stmt->execute($tagsarray);
+		 $tab[0]="OK";
+		 $i=1;
+		 while($ligne=$stmt->fetch(PDO::FETCH_ASSOC)){
+			$tab[$i]=array();
+			$tab[$i]['id']=$ligne['id'];
+			$tab[$i]['title']=$ligne['title'];
+			$tab[$i]['description']=$ligne['description'];
+			$tab[$i]['address']=$ligne['address'];
+			$tab[$i]['longitude']=$ligne['longitude'];
+			$tab[$i]['latitude']=$ligne['latitude'];
+			$tab[$i]['url']=$ligne['url'];
+			$tab[$i]['price']=$ligne['price'];
+			$tab[$i]['distanceKM']='0.0';
+			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir .$ligne['image']."_small.jpg"));
+			$i++;
+		 }
+	 }catch (Exception $e){
+		 $tab[0]="NOK";
+	 }finally {
+		echo json_encode($tab);
+	 }
+ }
+
  function listerParId(){
 	 global $connexion,$tab;
 	$photo_dir="../photos/";
@@ -203,6 +244,9 @@
 		break;
 	case "enlever":
 		enlever();
+		break;
+	case "listerAvecTags":
+		listerAvecTags();
 		break;
  }
 ?>
