@@ -38,7 +38,6 @@ public class ServerActivity extends AppCompatActivity {
     public static final boolean LOCAL_SERVER = false;
     public static final String CONTROLLEUR_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/PHP/";
     public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "activityControleurJSON.php";
-
     public static final String CONTROLLEUR_LOCAL_ENTRY_POINT = "http://10.0.2.2:8888/ProjetFinal/PHP/";
 
     public static final String SERVICE = "com.example.lspoulin.montrealapp.ServerActivity.service";
@@ -48,10 +47,15 @@ public class ServerActivity extends AppCompatActivity {
     public static final String SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE = "com.example.lspoulin.montrealapp.ServerActivity.service.listlandmarkorderbydistance";
     public static final String LANDMARK_LIST = "com.example.lspoulin.montrealapp.ServerActivity.service.listactivity";
 
+    public static final String SERVICE_GET_LANDMARK = "com.example.lspoulin.montrealapp.ServerActivity.service.getlandmark";
+    public static final String SERVICE_GET_LANDMARK_DUMMY_DATA = "com.example.lspoulin.montrealapp.ServerActivity.service.getlandmarkdummydata";
+    public static final String PARAM_LANDMARK_ID = "com.example.lspoulin.montrealapp.ServerActivity.service.paramlandmarkid";
+
     public static final String SERVICE_LOGIN = "com.example.lspoulin.montrealapp.ServerActivity.service.login";
     public static final String SERVICE_LOGIN_DUMMY_DATA = "com.example.lspoulin.montrealapp.ServerActivity.service.logindummydata";
     public static final String PARAM_LOGIN_USER = "com.example.lspoulin.montrealapp.ServerActivity.service.loginuser";
     public static final String PARAM_LOGIN_PASSWORD = "com.example.lspoulin.montrealapp.ServerActivity.service.loginpassword";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +65,13 @@ public class ServerActivity extends AppCompatActivity {
         String dataTransmited = intent.getStringExtra(SERVICE);
         if (dataTransmited != null)
             switch (dataTransmited) {
+                case SERVICE_GET_LANDMARK:
+                    int id = intent.getIntExtra(PARAM_LANDMARK_ID, 0);
+                    getLandmark(id);
+                    break;
+                case SERVICE_GET_LANDMARK_DUMMY_DATA:
+                    getLandmark();
+                    break;
                 case SERVICE_LIST_LANDMARK_DUMMY_DATA:
                     listLandmark();
                     break;
@@ -82,6 +93,72 @@ public class ServerActivity extends AppCompatActivity {
         else
             resultNotOk();
 
+
+    }
+
+    private void getLandmark() {
+        listLandmark();
+    }
+
+    private void getLandmark(final int id){
+        StringRequest requete = new StringRequest(Request.Method.POST, getControllerLandmark(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                JSONObject unLandmark;
+                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
+                                for(i=1;i<jsonResponse.length();i++){
+                                    unLandmark=jsonResponse.getJSONObject(i);
+
+                                    Landmark l = new Landmark(unLandmark.getInt("id"),
+                                            unLandmark.getString("title"),
+                                            unLandmark.getString("description"),
+                                            unLandmark.getString("address"),
+                                            (float)unLandmark.getDouble("latitude"),
+                                            (float) unLandmark.getDouble("longitude"),
+                                            unLandmark.getString("url"),
+                                            (float)unLandmark.getDouble("price"),
+                                            (float)unLandmark.getDouble("distanceKM"),
+                                            "");
+                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                    landmarks.add(l);
+                                }
+                                Intent result = new Intent();
+                                result.putParcelableArrayListExtra(ServerActivity.LANDMARK_LIST, landmarks);
+                                resultOk(result);
+                            }
+                            else{
+                                resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            resultNotOk();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        resultNotOk();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les parametres pour POST
+                params.put("action", "listerParId");
+                params.put("id", id+"");
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
 
     }
 

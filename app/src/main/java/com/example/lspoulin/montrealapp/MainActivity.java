@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int CODE_LIST_LANDMARK = 10001;
     public static final int CODE_LOGIN = 10002;
+    public static final int CODE_GET_LANDMARK = 10003;
 
     private List<Landmark> landmarkList;
     private ListView mainListView;
@@ -50,6 +51,11 @@ public class MainActivity extends AppCompatActivity {
         i.putExtra(ServerActivity.PARAM_LOGIN_USER,"root" );
         i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, "pass");
         startActivityForResult(i, CODE_LOGIN);
+
+        i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_GET_LANDMARK);
+        i.putExtra(ServerActivity.PARAM_LANDMARK_ID,1 );
+        startActivityForResult(i, CODE_GET_LANDMARK);
     }
 
     @Override
@@ -65,6 +71,16 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_OK){
             Toast.makeText(this, "Login successful", Toast.LENGTH_LONG).show();
         }
+        if(requestCode == CODE_GET_LANDMARK && resultCode == ServerActivity.RESULT_OK){
+            ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
+            String output = "";
+            for (Landmark l : listerLandmark){
+                output += l.getTitle();
+            }
+            Toast.makeText(this, output.substring(0, output.length()-1), Toast.LENGTH_LONG).show();
+        }
+
+
     }
 
     @Override
