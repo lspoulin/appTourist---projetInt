@@ -143,8 +143,9 @@ public class ServerActivity extends AppCompatActivity {
                                             unLandmark.getString("url"),
                                             (float)unLandmark.getDouble("price"),
                                             (float)unLandmark.getDouble("distanceKM"),
-                                            getDrawableBitmapFromJSON(unLandmark.getString("image"))
+                                            ""
                                     );
+                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                     landmarks.add(l);
                                 }
                                 Intent result = new Intent();
@@ -213,7 +214,8 @@ public class ServerActivity extends AppCompatActivity {
                                             unLandmark.getString("url"),
                                             (float)unLandmark.getDouble("price"),
                                             (float)unLandmark.getDouble("distanceKM"),
-                                            getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                            "");
+                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                     landmarks.add(l);
                                 }
                                 Intent result = new Intent();

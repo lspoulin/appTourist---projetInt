@@ -7,6 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.util.Random;
 
 /**
  * Created by lspoulin on 2018-04-20.
@@ -23,17 +24,25 @@ public class Landmark implements Serializable, Parcelable {
     private String url;
 
     public Drawable getImage() {
-        return image;
+        return DrawableManager.getInstance().getDrawable(image);
+
     }
 
-    public void setImage(Drawable image) {
+    public void setImage(Drawable drawable) {
+        this.image = title + new Random().nextLong();
+        DrawableManager.getInstance().addDrawable(this.image, drawable);
+
+    }
+
+    public void setImage(String image) {
         this.image = image;
+
     }
 
     //TODO : add tumbnail and normal images
     private float price;
 
-    private Drawable image;
+    private String image;
 
     public float getDistanceKM() {
         return distanceKM;
@@ -114,7 +123,7 @@ public class Landmark implements Serializable, Parcelable {
     }
 
     public Landmark(int id, String title, String description, String address, float latitude, float longitude,
-                    String url, float price, float distanceKM, Drawable image){
+                    String url, float price, float distanceKM, String image){
         this.id = id;
         this.title = title;
         this.description = description;
@@ -143,10 +152,7 @@ public class Landmark implements Serializable, Parcelable {
         parcel.writeString(url);
         parcel.writeFloat(price);
         parcel.writeFloat(distanceKM);
-
-        Bitmap bitmap = (Bitmap)((BitmapDrawable) image).getBitmap();
-        parcel.writeParcelable(bitmap, i);
-
+        parcel.writeString(image);
     }
 
     public static final Parcelable.Creator<Landmark> CREATOR = new Creator<Landmark>() {
@@ -163,10 +169,10 @@ public class Landmark implements Serializable, Parcelable {
             landmark.setUrl(parcel.readString());
             landmark.setPrice(parcel.readFloat());
             landmark.setDistanceKM(parcel.readFloat());
-
-            Bitmap bitmap = (Bitmap)parcel.readParcelable(getClass().getClassLoader());
+            landmark.setImage(parcel.readString());
+            //Bitmap bitmap = (Bitmap)parcel.readParcelable(getClass().getClassLoader());
             // Convert Bitmap to Drawable:
-            landmark.setImage(new BitmapDrawable(bitmap));
+            //landmark.setImage(new BitmapDrawable(bitmap));
 
             return landmark;
         }
