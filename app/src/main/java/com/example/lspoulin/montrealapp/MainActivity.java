@@ -9,22 +9,37 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int CODE_LIST_LANDMARK = 10001;
     public static final int CODE_LOGIN = 10002;
 
+    private List<Landmark> landmarkList;
+    private ListView mainListView;
+    private CustomAdapter customAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+        landmarkList = new ArrayList<Landmark>();
+
+        mainListView = (ListView) findViewById(R.id.listView);
+        customAdapter = new CustomAdapter();
+        mainListView.setAdapter(customAdapter);
+
 
         Intent i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK);
@@ -43,10 +58,8 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode == CODE_LIST_LANDMARK && resultCode == ServerActivity.RESULT_OK){
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
             String output = "";
-            for (Landmark l : listerLandmark){
-                output += l.getTitle() + " " + l.getDistanceKM()+ "km\n";
-            }
-            Toast.makeText(this, output.substring(0, output.length()-1), Toast.LENGTH_LONG).show();
+            landmarkList = listerLandmark;
+            customAdapter.notifyDataSetChanged();
         }
 
         if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_OK){
@@ -74,5 +87,36 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    class CustomAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+
+            return landmarkList.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            view = getLayoutInflater().inflate(R.layout.sample_row, null);
+            TextView title = (TextView) view.findViewById(R.id.title);
+            ImageView image = (ImageView) view.findViewById(R.id.image);
+
+            Landmark l = landmarkList.get(i);
+            title.setText(l.getTitle());
+            image.setImageDrawable(l.getImage());
+            return view;
+        }
     }
 }
