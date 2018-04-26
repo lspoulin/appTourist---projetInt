@@ -9,13 +9,183 @@
 
 
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
+    <LinearLayout
+
+
+        android:orientation="vertical"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp" />
+        android:layout_width="match_parent">
+
+        <LinearLayout
+
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            android:layout_height="75dp"
+            android:layout_weight="0.20"
+            android:layout_width="match_parent">
+
+            <TextView
+                android:id="@+id/txtTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="0.90"
+                android:fontFamily="sans-serif"
+                android:text="App Touristique"
+                android:textAlignment="textStart"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="20dp"
+                android:gravity="start" />
+
+            <ImageButton
+                android:id="@+id/btnUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="0.10"
+                android:background="@color/colorPrimary"
+                app:srcCompat="@drawable/usercinqante"
+                android:layout_marginRight="20dp" />
+
+        </LinearLayout>
 
 
+        <LinearLayout
+
+            android:background="@color/colorAccentDark"
+            android:orientation="horizontal"
+            android:layout_height="50dp"
+            android:layout_weight="0.10"
+            android:layout_width="match_parent">
+
+
+            <TextView
+                android:id="@+id/txtTri"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="0.20"
+                android:text="Trier Par :"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/spnSort"
+                android:layout_width="129dp"
+                android:layout_height="23dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="0.80"
+                android:background="@android:color/white" />
+
+            <TextView
+                android:id="@+id/txtTemp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="25dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:text="36C"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:gravity="end"
+                android:layout_marginRight="25dp" />
+
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/listAct"
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            android:layout_weight="0.50"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:background="@color/colorPrimary"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:orientation="horizontal">
+
+
+            <ImageButton
+                android:id="@+id/btnPref"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                app:srcCompat="@drawable/pref" />
+
+            <ImageButton
+                android:id="@+id/btnFav"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/fav"
+                android:layout_marginTop="10dp"
+                android:background="@color/colorPrimary"/>
+
+            <ImageButton
+                android:id="@+id/btnSrch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/srch"
+                android:layout_marginTop="10dp"
+                android:background="@color/colorPrimary"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:layout_weight="0.5"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtPref"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:text="Preference"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtFav"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:text="Favoris"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:text="Recherche"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

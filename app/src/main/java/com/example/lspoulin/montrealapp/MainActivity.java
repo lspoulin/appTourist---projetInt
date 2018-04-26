@@ -13,26 +13,30 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
 
     public static final int CODE_LIST_LANDMARK = 10001;
     public static final int CODE_LOGIN = 10002;
     public static final int CODE_GET_LANDMARK = 10003;
     public static final int CODE_LIST_LANDMARK_WITH_TAGS = 10004;
-
+    Spinner spinSortBy;
     private List<Landmark> landmarkList;
     private ListView mainListView;
     private CustomAdapter customAdapter;
+    ImageButton btnUtilisateur, btnPreference, btnFavoris, btnRecherche;
 
 
     @Override
@@ -40,45 +44,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        landmarkList = new ArrayList<Landmark>();
 
-        mainListView = (ListView) findViewById(R.id.listView);
-        customAdapter = new CustomAdapter();
-        mainListView.setAdapter(customAdapter);
+        spinSortBy = (Spinner) findViewById(R.id.spnSort);
+        btnFavoris = (ImageButton)findViewById(R.id.btnFav);
+        btnUtilisateur = (ImageButton)findViewById(R.id.btnUser);
+        btnPreference = (ImageButton)findViewById(R.id.btnPref);
+        btnRecherche = (ImageButton)findViewById(R.id.btnSrch);
+        spinSortBy = (Spinner) findViewById(R.id.spnSort);
+
+        btnFavoris.setOnClickListener(this);
+        btnUtilisateur.setOnClickListener(this);
+        btnRecherche.setOnClickListener(this);
+        btnPreference.setOnClickListener(this);
 
 
-        Intent i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, CODE_LIST_LANDMARK);
-        overridePendingTransition(0,0);
 
-        /*i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN_DUMMY_DATA);
-        i.putExtra(ServerActivity.PARAM_LOGIN_USER,"root" );
-        i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, "pass");
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, CODE_LOGIN);
-        overridePendingTransition(0,0);*/
+        ArrayAdapter<CharSequence> spinAdapter = ArrayAdapter.createFromResource(this, R.array.sort_activity, android.R.layout.simple_spinner_item);
+        spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinSortBy.setAdapter(spinAdapter);
+        spinSortBy.setOnItemSelectedListener(this);
 
-        /*i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_WITH_TAGS);
-        i.putExtra(ServerActivity.PARAM_LANDMARK_TAGS,"sport,family" );
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, CODE_LIST_LANDMARK_WITH_TAGS);
-*/
-        mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i  = new Intent(MainActivity.this, ServerActivity.class);
-                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_GET_LANDMARK);
-                i.putExtra(ServerActivity.PARAM_LANDMARK_ID,landmarkList.get(position).getId() );
-                i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivityForResult(i, CODE_GET_LANDMARK);
-                overridePendingTransition(0,0);
 
-            }
-        });
     }
 
     private void showLandmark(final Landmark landmark) {
@@ -162,6 +148,74 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+        landmarkList = new ArrayList<Landmark>();
+
+        mainListView = (ListView) findViewById(R.id.listAct);
+        customAdapter = new CustomAdapter();
+        mainListView.setAdapter(customAdapter);
+
+
+        Intent i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(i, CODE_LIST_LANDMARK);
+        overridePendingTransition(0,0);
+
+        /*i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN_DUMMY_DATA);
+        i.putExtra(ServerActivity.PARAM_LOGIN_USER,"root" );
+        i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, "pass");
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(i, CODE_LOGIN);
+        overridePendingTransition(0,0);*/
+
+        i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_WITH_TAGS);
+        i.putExtra(ServerActivity.PARAM_LANDMARK_TAGS,"sport" );
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(i, CODE_LIST_LANDMARK_WITH_TAGS);
+
+        mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i  = new Intent(MainActivity.this, ServerActivity.class);
+                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_GET_LANDMARK);
+                i.putExtra(ServerActivity.PARAM_LANDMARK_ID,landmarkList.get(position).getId() );
+                i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivityForResult(i, CODE_GET_LANDMARK);
+                overridePendingTransition(0,0);
+
+            }
+        });
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        if(view.getId() == R.id.btnFav){
+            Toast.makeText(this, "Button Fav CLicked", Toast.LENGTH_LONG). show();
+
+        }else if(view.getId() == R.id.btnUser){
+            Toast.makeText(this, "Button User CLicked", Toast.LENGTH_LONG). show();
+
+        }else if(view.getId() == R.id.btnPref){
+            Toast.makeText(this, "Button Pref CLicked", Toast.LENGTH_LONG). show();
+
+        }else if(view.getId() == R.id.btnSrch){
+            Toast.makeText(this, "Button Srch CLicked", Toast.LENGTH_LONG). show();
+
+
+        }
+    }
+
     class CustomAdapter extends BaseAdapter {
 
         @Override
@@ -183,11 +237,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             view = getLayoutInflater().inflate(R.layout.sample_row, null);
-            TextView title = (TextView) view.findViewById(R.id.title);
-            ImageView image = (ImageView) view.findViewById(R.id.image);
+            TextView title = (TextView) view.findViewById(R.id.txtTitre);
+            TextView adresse = (TextView) view.findViewById(R.id.txtAdresse);
+            ImageView image = (ImageView) view.findViewById(R.id.imgSmall);
 
             Landmark l = landmarkList.get(i);
             title.setText(l.getTitle());
+            adresse.setText(l.getAddress());
             image.setImageDrawable(l.getImage());
             return view;
         }
