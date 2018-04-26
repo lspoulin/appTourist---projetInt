@@ -12,6 +12,7 @@ import android.location.Address;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Parcelable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,6 +31,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +41,7 @@ public class ServerActivity extends AppCompatActivity {
     public static final boolean LOCAL_SERVER = false;
     public static final String CONTROLLEUR_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/PHP/";
     public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "activityControleurJSON.php";
+    public static final String CONTROLLEUR_USER_ENDPOINT = "userControleurJSON.php";
     public static final String CONTROLLEUR_LOCAL_ENTRY_POINT = "http://10.0.2.2:8888/ProjetFinal/PHP/";
 
     public static final String SERVICE = "com.example.lspoulin.montrealapp.ServerActivity.service";
@@ -58,7 +62,12 @@ public class ServerActivity extends AppCompatActivity {
     public static final String SERVICE_LOGIN_DUMMY_DATA = "com.example.lspoulin.montrealapp.ServerActivity.service.logindummydata";
     public static final String PARAM_LOGIN_USER = "com.example.lspoulin.montrealapp.ServerActivity.service.loginuser";
     public static final String PARAM_LOGIN_PASSWORD = "com.example.lspoulin.montrealapp.ServerActivity.service.loginpassword";
+    public static final String USER = "com.example.lspoulin.montrealapp.ServerActivity.service.user";
 
+    public static final String SERVICE_NEW_USER = "com.example.lspoulin.montrealapp.ServerActivity.service.newuser";
+    public static final String PARAM_NEW_USER_USER = "com.example.lspoulin.montrealapp.ServerActivity.service.paramUser";
+    public static final String PARAM_NEW_USER_PASSWORD = "com.example.lspoulin.montrealapp.ServerActivity.service.parampassword";
+    public static final String PARAM_NEW_USER_EMAIL = "com.example.lspoulin.montrealapp.ServerActivity.service.paramemail";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +75,12 @@ public class ServerActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String dataTransmited = intent.getStringExtra(SERVICE);
+        String user, password, email, tags, preferences;
+        int id;
         if (dataTransmited != null)
             switch (dataTransmited) {
                 case SERVICE_GET_LANDMARK:
-                    int id = intent.getIntExtra(PARAM_LANDMARK_ID, 0);
+                    id = intent.getIntExtra(PARAM_LANDMARK_ID, 0);
                     getLandmark(id);
                     break;
                 case SERVICE_GET_LANDMARK_DUMMY_DATA:
@@ -82,16 +93,25 @@ public class ServerActivity extends AppCompatActivity {
                     listerLandmark();
                     break;
                 case SERVICE_LOGIN_DUMMY_DATA:
-                    String user = intent.getStringExtra(PARAM_LOGIN_USER);
-                    String password = intent.getStringExtra(PARAM_LOGIN_PASSWORD);
+                    user = intent.getStringExtra(PARAM_LOGIN_USER);
+                    password = intent.getStringExtra(PARAM_LOGIN_PASSWORD);
                     loginDummy(user, password);
+                    break;
+                case SERVICE_LOGIN:
+                    login(intent.getStringExtra(PARAM_LOGIN_USER), intent.getStringExtra(PARAM_LOGIN_PASSWORD));
                     break;
                 case SERVICE_LIST_LANDMARK_ORDER_BY_DISTANCE:
                     attemptToGPS();
                     break;
                 case SERVICE_LIST_LANDMARK_WITH_TAGS:
-                    String tags = intent.getStringExtra(PARAM_LANDMARK_TAGS);
+                    tags = intent.getStringExtra(PARAM_LANDMARK_TAGS);
                     listerLandmarkWithTags(tags);
+                    break;
+                case SERVICE_NEW_USER:
+                    user = intent.getStringExtra(PARAM_NEW_USER_USER);
+                    password = intent.getStringExtra(PARAM_NEW_USER_PASSWORD);
+                    email = intent.getStringExtra(PARAM_NEW_USER_EMAIL);
+                    createNewUser(user,password,email);
                     break;
                 default:
                     resultNotOk();
@@ -99,6 +119,131 @@ public class ServerActivity extends AppCompatActivity {
             }
         else
             resultNotOk();
+    }
+
+    private void createNewUser(final String name, final String password, final String email) {
+        StringRequest requete = new StringRequest(Request.Method.POST, getControllerUser(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                JSONObject unUser;
+                                Intent result = new Intent();
+                                resultOk(result);
+                            }
+                            else{
+                                resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            resultNotOk();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        resultNotOk();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les   parametres pour POST
+                params.put("action", "enregistrer");
+                params.put("name", name);
+                params.put("password", md5(password));
+                params.put("email", email);
+                params.put("preferences", "sport");
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
+    }
+
+    private void login(final String user, final String password) {
+        StringRequest requete = new StringRequest(Request.Method.POST, getControllerUser(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                JSONObject unUser;
+                                User user = new User();
+                                for(i=1;i<jsonResponse.length();i++){
+                                    unUser=jsonResponse.getJSONObject(i);
+                                    user = new User(unUser.getInt("id"),
+                                            unUser.getString("name"),
+                                            unUser.getString("email"),
+                                            unUser.getString("preferences"));
+
+                                }
+                                Intent result = new Intent();
+                                result.putExtra(ServerActivity.USER, (Parcelable)user);
+                                resultOk(result);
+                            }
+                            else{
+                                resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            resultNotOk();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        resultNotOk();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les   parametres pour POST
+                params.put("action", "login");
+                params.put("user", user);
+                params.put("password", md5(password));
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
+    }
+
+    public static final String md5(final String s) {
+        final String MD5 = "MD5";
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest
+                    .getInstance(MD5);
+            digest.update(s.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuilder hexString = new StringBuilder();
+            for (byte aMessageDigest : messageDigest) {
+                String h = Integer.toHexString(0xFF & aMessageDigest);
+                while (h.length() < 2)
+                    h = "0" + h;
+                hexString.append(h);
+            }
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     private void listerLandmarkWithTags(final String tags) {
@@ -401,11 +546,18 @@ public class ServerActivity extends AppCompatActivity {
         Volley.newRequestQueue(this).add(requete);
     }
 
-    private String getControllerLandmark() {
+    public String getControllerLandmark() {
         if (LOCAL_SERVER)
             return CONTROLLEUR_LOCAL_ENTRY_POINT + CONTROLLEUR_LANDMARK_ENDPOINT;
         else
             return CONTROLLEUR_ENTRY_POINT + CONTROLLEUR_LANDMARK_ENDPOINT;
+    }
+
+    public String getControllerUser() {
+        if (LOCAL_SERVER)
+            return CONTROLLEUR_LOCAL_ENTRY_POINT + CONTROLLEUR_USER_ENDPOINT;
+        else
+            return CONTROLLEUR_ENTRY_POINT + CONTROLLEUR_USER_ENDPOINT;
     }
 
 

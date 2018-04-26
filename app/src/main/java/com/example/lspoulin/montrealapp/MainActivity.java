@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final int CODE_LOGIN = 10002;
     public static final int CODE_GET_LANDMARK = 10003;
     public static final int CODE_LIST_LANDMARK_WITH_TAGS = 10004;
+    public static final int CODE_CREATE_NEW_USER = 10005;
     Spinner spinSortBy;
     private List<Landmark> landmarkList;
     private ListView mainListView;
@@ -110,7 +111,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_OK){
-            Toast.makeText(this, "Login successful", Toast.LENGTH_LONG).show();
+            User user = intent.getParcelableExtra(ServerActivity.USER);
+            Toast.makeText(this, "Login successful for user : " + user.getName(), Toast.LENGTH_LONG).show();
+        }
+        if(requestCode == CODE_CREATE_NEW_USER && resultCode == ServerActivity.RESULT_OK){
+            //User user = intent.getParcelableExtra(ServerActivity.USER);
+            Toast.makeText(this, "User created : " , Toast.LENGTH_LONG).show();
+        }
+
+        if(requestCode == CODE_CREATE_NEW_USER && resultCode == ServerActivity.RESULT_CANCELED){
+            //User user = intent.getParcelableExtra(ServerActivity.USER);
+            Toast.makeText(this, "User not created" , Toast.LENGTH_LONG).show();
+        }
+
+        if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_CANCELED){
+            Toast.makeText(this, "Login unsuccessfull", Toast.LENGTH_LONG).show();
         }
         if(requestCode == CODE_GET_LANDMARK && resultCode == ServerActivity.RESULT_OK){
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
@@ -163,13 +178,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         startActivityForResult(i, CODE_LIST_LANDMARK);
         overridePendingTransition(0,0);
 
-        /*i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN_DUMMY_DATA);
-        i.putExtra(ServerActivity.PARAM_LOGIN_USER,"root" );
-        i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, "pass");
+        i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN);
+        i.putExtra(ServerActivity.PARAM_LOGIN_USER,"lspoulin" );
+        i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, "allo");
         i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivityForResult(i, CODE_LOGIN);
-        overridePendingTransition(0,0);*/
+        overridePendingTransition(0,0);
+
+
+        i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_NEW_USER);
+        i.putExtra(ServerActivity.PARAM_NEW_USER_USER,"lspoulin2" );
+        i.putExtra(ServerActivity.PARAM_NEW_USER_PASSWORD, "allotoi");
+        i.putExtra(ServerActivity.PARAM_NEW_USER_EMAIL, "lspoulin2@gmail.com");
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(i, CODE_CREATE_NEW_USER);
+        overridePendingTransition(0,0);
 
         i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_WITH_TAGS);
