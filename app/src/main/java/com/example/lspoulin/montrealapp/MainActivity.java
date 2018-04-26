@@ -61,12 +61,12 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(i, CODE_LOGIN);
         overridePendingTransition(0,0);*/
 
-        i  = new Intent(MainActivity.this, ServerActivity.class);
+        /*i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_WITH_TAGS);
         i.putExtra(ServerActivity.PARAM_LANDMARK_TAGS,"sport,family" );
         i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivityForResult(i, CODE_LIST_LANDMARK_WITH_TAGS);
-
+*/
         mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
