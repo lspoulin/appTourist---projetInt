@@ -22,6 +22,25 @@ public class Landmark implements Serializable, Parcelable {
     private float longitude;
     private float latitude;
     private String url;
+    private String tags;
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
+    }
+
+    private boolean liked;
 
     public Drawable getImage() {
         return DrawableManager.getInstance().getDrawable(image);
@@ -123,7 +142,7 @@ public class Landmark implements Serializable, Parcelable {
     }
 
     public Landmark(int id, String title, String description, String address, float latitude, float longitude,
-                    String url, float price, float distanceKM, String image){
+                    String url, float price, float distanceKM, String image, String tags, boolean liked){
         this.id = id;
         this.title = title;
         this.description = description;
@@ -134,6 +153,8 @@ public class Landmark implements Serializable, Parcelable {
         this.price = price;
         this.distanceKM = distanceKM;
         this.image = image;
+        this.tags = tags;
+        this.liked = liked;
     }
 
     @Override
@@ -153,6 +174,7 @@ public class Landmark implements Serializable, Parcelable {
         parcel.writeFloat(price);
         parcel.writeFloat(distanceKM);
         parcel.writeString(image);
+        parcel.writeByte((byte)(liked?1:0));
     }
 
     public static final Parcelable.Creator<Landmark> CREATOR = new Creator<Landmark>() {
@@ -170,6 +192,7 @@ public class Landmark implements Serializable, Parcelable {
             landmark.setPrice(parcel.readFloat());
             landmark.setDistanceKM(parcel.readFloat());
             landmark.setImage(parcel.readString());
+            landmark.setLiked((parcel.readByte()==0)?false:true);
 
             return landmark;
         }

@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerActivity extends AppCompatActivity {
-    public static final boolean LOCAL_SERVER = false;
+    public static final boolean LOCAL_SERVER = true;
     public static final String CONTROLLEUR_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/PHP/";
     public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "activityControleurJSON.php";
     public static final String CONTROLLEUR_LOCAL_ENTRY_POINT = "http://10.0.2.2:8888/ProjetFinal/PHP/";
@@ -126,7 +126,9 @@ public class ServerActivity extends AppCompatActivity {
                                                 unLandmark.getString("url"),
                                                 (float)unLandmark.getDouble("price"),
                                                 (float)unLandmark.getDouble("distanceKM"),
-                                                "");
+                                                "",
+                                                unLandmark.getString("tags"),
+                                                unLandmark.getBoolean("liked"));
                                         l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                         landmarks.add(l);
                                     }
@@ -192,7 +194,9 @@ public class ServerActivity extends AppCompatActivity {
                                             unLandmark.getString("url"),
                                             (float)unLandmark.getDouble("price"),
                                             (float)unLandmark.getDouble("distanceKM"),
-                                            "");
+                                            "",
+                                            unLandmark.getString("tags"),
+                                            unLandmark.getBoolean("liked"));
                                     l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                     landmarks.add(l);
                                 }
@@ -287,7 +291,9 @@ public class ServerActivity extends AppCompatActivity {
                                             unLandmark.getString("url"),
                                             (float)unLandmark.getDouble("price"),
                                             (float)unLandmark.getDouble("distanceKM"),
-                                            ""
+                                            "",
+                                            unLandmark.getString("tags"),
+                                            unLandmark.getBoolean("liked")
                                     );
                                     l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                     landmarks.add(l);
@@ -358,7 +364,9 @@ public class ServerActivity extends AppCompatActivity {
                                             unLandmark.getString("url"),
                                             (float)unLandmark.getDouble("price"),
                                             (float)unLandmark.getDouble("distanceKM"),
-                                            "");
+                                            "",
+                                            unLandmark.getString("tags"),
+                                            unLandmark.getBoolean("liked"));
                                     l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                     landmarks.add(l);
                                 }
@@ -417,7 +425,9 @@ public class ServerActivity extends AppCompatActivity {
                 "http://parcolympique.qc.ca",
                 0.0f,
                 1.0f,
-                null
+                null,
+                "sport",
+                false
         ));
 
         result.putParcelableArrayListExtra(this.LANDMARK_LIST, landmarkList);

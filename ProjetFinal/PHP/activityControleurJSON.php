@@ -51,6 +51,8 @@
 			$tab[$i]['price']=$ligne['price'];
 			$tab[$i]['distanceKM']=$ligne['distance_in_km'];
 			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir .$ligne['image']."_small.jpg"));
+			$tab[$i]['tags']=$ligne['tags'];
+			$tab[$i]['liked']=false;
 			$i++;
 		 }
 	 }catch (Exception $e){
@@ -81,6 +83,8 @@
 			$tab[$i]['price']=$ligne['price'];
 			$tab[$i]['distanceKM']='0.0';
 			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir .$ligne['image']."_small.jpg"));
+			$tab[$i]['tags']=$ligne['tags'];
+			$tab[$i]['liked']=false;
 			$i++;
 		 }
 	 }catch (Exception $e){
@@ -122,6 +126,8 @@ function listerAvecTags(){
 			$tab[$i]['price']=$ligne['price'];
 			$tab[$i]['distanceKM']='0.0';
 			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir .$ligne['image']."_small.jpg"));
+			$tab[$i]['tags']=$ligne['tags'];
+			$tab[$i]['liked']=false;
 			$i++;
 		 }
 	 }catch (Exception $e){
@@ -153,6 +159,8 @@ function listerAvecTags(){
 			$tab[$i]['price']=$ligne['price'];
 			$tab[$i]['distanceKM']='0.0';
 			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir . $ligne['image'].".jpg"));
+			$tab[$i]['tags']=$ligne['tags'];
+			$tab[$i]['liked']=false;
 			$i++;
 		 }
 	 }catch (Exception $e){
