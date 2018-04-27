@@ -24,6 +24,15 @@ public class Landmark implements Serializable, Parcelable {
     private String url;
     private String tags;
 
+    public double calculateDistanceKM(int latitude, int longitude){
+        return 111.111 *
+                Math.toDegrees((Math.acos(Math.cos(Math.toRadians(this.latitude))
+                        * Math.cos(Math.toRadians(latitude))
+                        * Math.cos(Math.toRadians(this.longitude - longitude))
+                        + Math.sin(Math.toRadians(this.latitude))
+                        * Math.sin(Math.toRadians(latitude)))));
+    }
+
     public String getTags() {
         return tags;
     }

@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private List<Landmark> landmarkList;
     private ListView mainListView;
     private CustomAdapter customAdapter;
-    ImageButton btnUtilisateur, btnPreference, btnFavoris, btnRecherche;
+    private ImageButton btnUtilisateur, btnPreference, btnFavoris, btnRecherche;
+    private ProgressBar progress;
 
 
     @Override
@@ -73,13 +75,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnPreference = (ImageButton)findViewById(R.id.btnPref);
         btnRecherche = (ImageButton)findViewById(R.id.btnSrch);
         spinSortBy = (Spinner) findViewById(R.id.spnSort);
+        progress = (ProgressBar) findViewById(R.id.progressBar);
+        progress.setVisibility(View.GONE);
 
         btnFavoris.setOnClickListener(this);
         btnUtilisateur.setOnClickListener(this);
         btnRecherche.setOnClickListener(this);
         btnPreference.setOnClickListener(this);
 
-
+        landmarkList = new ArrayList<Landmark>();
 
         ArrayAdapter<CharSequence> spinAdapter = ArrayAdapter.createFromResource(this, R.array.sort_activity, android.R.layout.simple_spinner_item);
         spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -244,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void loadLandmarks() {
+        progress.setVisibility(View.VISIBLE);
         StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
                 new Response.Listener<String>() {
                     @Override
@@ -285,12 +290,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             e.printStackTrace();
                             //resultNotOk();
                         }
+                        finally {
+                            progress.setVisibility(View.GONE);
+                        }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //resultNotOk();
+                        progress.setVisibility(View.GONE);
                     }
                 }
         ) {
@@ -306,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         };
         Volley.newRequestQueue(this).add(requete);
     }
-    
+
     private void loadLandmarkById(final int id){
         StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
                 new Response.Listener<String>() {
@@ -447,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-        landmarkList = new ArrayList<Landmark>();
+
 
         mainListView = (ListView) findViewById(R.id.listAct);
         customAdapter = new CustomAdapter();
