@@ -196,11 +196,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         startActivityForResult(i, CODE_CREATE_NEW_USER);
         overridePendingTransition(0,0);*/
 
-        i  = new Intent(MainActivity.this, ServerActivity.class);
+        /*i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_WITH_TAGS);
         i.putExtra(ServerActivity.PARAM_LANDMARK_TAGS,"sport" );
         i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, CODE_LIST_LANDMARK_WITH_TAGS);
+        startActivityForResult(i, CODE_LIST_LANDMARK_WITH_TAGS);*/
 
         mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
@@ -226,7 +226,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onClick(View view) {
 
         if(view.getId() == R.id.btnFav){
-            Toast.makeText(this, "Button Fav CLicked", Toast.LENGTH_LONG). show();
+            try {
+                for (Landmark l : landmarkList) {
+                    if (!l.isLiked()) {
+                        landmarkList.remove(l);
+                    }
+
+                }
+                customAdapter.notifyDataSetChanged();
+            }
+            catch (Exception e){
+
+            }
 
         }else if(view.getId() == R.id.btnUser){
             if (UserManager.getInstance().isLoggin()){

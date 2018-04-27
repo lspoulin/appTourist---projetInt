@@ -152,8 +152,8 @@
  function activityLiked(){
 	 global $connexion,$tab;
 	try{
-		 $user_id=$_POST['user_id'];
-		 $activity_id=$_POST['activity_id'];
+		 $user_id=$_POST['userid'];
+		 $activity_id=$_POST['activityid'];
 		 $requete="INSERT INTO liked VALUES(?,?)";
 		 //echo $requete;
 		 $stmt = $connexion->prepare($requete);
@@ -169,7 +169,8 @@
  function activityUnliked(){
 	 global $connexion,$tab;
 	try{
-		 $id=$_POST['id'];
+		 $user_id=$_POST['userid'];
+		 $activity_id=$_POST['activityid'];
 		 $requete="DELETE FROM liked WHERE user_id=? AND activity_id=?";
 		 //echo $requete;
 		 $stmt = $connexion->prepare($requete);

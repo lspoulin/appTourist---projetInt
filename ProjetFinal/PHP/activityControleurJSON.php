@@ -2,25 +2,6 @@
  require_once("../BD/connexion.inc.php");
  
  $tab=array();
- function enregistrer(){
-	global $connexion,$tab;
-	
-	try{
-		 $name=$_POST['name'];
-		 $firstname=$_POST['firstname'];
-		 $phone=$_POST['phone'];
-
-		 $requete="INSERT INTO contacts VALUES(NULL, ?,?,?)";
-		 $stmt = $connexion->prepare($requete);
-		 $stmt->execute(array($name,$firstname,$phone));
-		 $dernierID=$connexion->lastInsertId();
-		 $tab[0]="OK";
-	 }catch (Exception $e){
-		 $tab[0]="NOK";
-	 }finally {
-		echo json_encode($tab);
-	 }
- }
 
  function listerParDistance(){
 	 global $connexion,$tab;
@@ -65,10 +46,22 @@
  function lister(){
 	 global $connexion,$tab;
 	 $photo_dir="../photos/";
-	 $requete="SELECT * FROM activity";
+	 
+	 if(isset($_POST['userid'])){
+	 	$user_id=$_POST['userid'];
+	 	$requete="SELECT activity.*, activity.id IN (SELECT activity.id FROM `activity` INNER JOIN liked ON liked.activity_id=activity.id WHERE liked.user_id =?) as 'liked' FROM activity";
+	 }
+	 else{
+	 	$requete="SELECT *, false as 'liked' FROM activity";
+	 }
 	 try{
 		 $stmt = $connexion->prepare($requete);
-		 $stmt->execute();
+		 if(isset($_POST['userid'])){
+		 	$stmt->execute(array($user_id));
+		 }
+		 else{
+		 	$stmt->execute();
+		 }
 		 $tab[0]="OK";
 		 $i=1;
 		 while($ligne=$stmt->fetch(PDO::FETCH_ASSOC)){
@@ -84,7 +77,7 @@
 			$tab[$i]['distanceKM']='0.0';
 			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir .$ligne['image']."_small.jpg"));
 			$tab[$i]['tags']=$ligne['tags'];
-			$tab[$i]['liked']=false;
+			$tab[$i]['liked']=$ligne['liked'];;
 			$i++;
 		 }
 	 }catch (Exception $e){
@@ -170,71 +163,13 @@ function listerAvecTags(){
 	 }
  }
  
- function modifier(){
-	global $connexion,$tab;
-	$id=$_POST['id'];
-	$requete="SELECT * FROM contacts WHERE id=?";
-	try{
-		 $stmt = $connexion->prepare($requete);
-		 $stmt->execute(array($id));
-		 $tab[0]="OK";
-		 $i=1;
-		 if($ligne=$stmt->fetch(PDO::FETCH_ASSOC)){
-			$tab[$i]=array();
-			$tab[$i]['id']=$ligne['id'];
-			$tab[$i]['name']=$ligne['name'];
-			$tab[$i]['firstname']=$ligne['firstname'];
-			$tab[$i]['phone']=$ligne['phone'];
-		}else{
-			$tab[0]="Ce contact est inexistant !!!";
-		}
-	}catch (Exception $e){
-		 $tab[0]="NOK";
-	}finally {
-		echo json_encode($tab);
-	 }	
- }
- function maj(){
-	global $connexion,$tab;
-	try{
-		 $id=$_POST['id'];
-		 $name=$_POST['name'];
-		 $firstname=$_POST['firstname'];
-		 $phone=$_POST['phone'];
-		 $requete="UPDATE contacts SET name=?,firstname=?,phone=? WHERE id=?";
-		 $stmt = $connexion->prepare($requete);
-		 $stmt->execute(array($name,$firstname,$phone,$id));
-		 $tab[0]="OK";
-	 }catch (Exception $e){
-		 $tab[0]="NOK";
-	 }finally {
-		echo json_encode($tab);
-	 }
- }
- function enlever(){
-	 global $connexion,$tab;
-	try{
-		 $id=$_POST['id'];
-		 $requete="DELETE FROM contacts WHERE id=?";
-		 //echo $requete;
-		 $stmt = $connexion->prepare($requete);
-		 $stmt->execute(array($id));
-		 $tab[0]="OK";
-	 }catch (Exception $e){
-		 $tab[0]="NOK";
-	 }finally {
-		echo json_encode($tab);
-	 }
- }
+ 
  
  //Le controleur
  $action=$_POST['action'];
 
 
  switch($action){
-	case "enregistrer":
-	   enregistrer();
-	   break;
 	case "listerParId":
 		listerParId();
 		break;
@@ -243,15 +178,6 @@ function listerAvecTags(){
 		break;
 	case "listerParDistance":
 		listerParDistance();
-		break;
-	case "modifier":
-		modifier();
-		break;
-	case "maj":
-		maj();
-		break;
-	case "enlever":
-		enlever();
 		break;
 	case "listerAvecTags":
 		listerAvecTags();
