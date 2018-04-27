@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +73,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void showLandmark(final Landmark landmark) {
+
+        Intent i;
+        i  = new Intent(MainActivity.this, LandmarkActivity.class);
+        i.putExtra("Landmark", (Parcelable) landmark);
+        startActivity(i);
+
+        /*
 
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.showlandmark);
@@ -132,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        dialog.show();
+        dialog.show();*/
 
     }
 
@@ -274,14 +282,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }else if(view.getId() == R.id.btnUser){
             if (UserManager.getInstance().isLoggin()){
-                showUserSetting();
+                Intent i  = new Intent(MainActivity.this, UserActivity.class);
             }
             else{
                 showUserLogin();
             }
 
         }else if(view.getId() == R.id.btnPref){
-            Toast.makeText(this, "Button Pref CLicked", Toast.LENGTH_LONG). show();
+            if (UserManager.getInstance().isLoggin()){
+                Intent i  = new Intent(MainActivity.this, ServerActivity.class);
+            }
+            else{
+                showUserLogin();
+            }
 
         }else if(view.getId() == R.id.btnSrch){
             Toast.makeText(this, "Button Srch CLicked", Toast.LENGTH_LONG). show();
