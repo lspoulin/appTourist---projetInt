@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerActivity extends AppCompatActivity {
-    public static final boolean LOCAL_SERVER = true;
+    public static final boolean LOCAL_SERVER = false;
     public static final String CONTROLLEUR_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/PHP/";
     public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "activityControleurJSON.php";
     public static final String CONTROLLEUR_USER_ENDPOINT = "userControleurJSON.php";

@@ -11,7 +11,6 @@
 		 $password=$_POST['password'];
 		 $tags=$_POST['preferences'];
 
-		 //echo($name . " " . $email . " " . $password . " " . $tags);
 		 $requete="INSERT INTO user VALUES(NULL, ?,?,?,?, 0)";
 		 $stmt = $connexion->prepare($requete);
 		 $stmt->execute(array($name,$email,$password, $tags));
@@ -53,8 +52,7 @@
 	 global $connexion,$tab;
 	 $user=$_POST['user'];
 	$password=$_POST['password'];
-	//echo($user);
-	//echo($password);
+
 	 $requete="SELECT * FROM user WHERE name=? AND password=?";
 	 try{
 		 $stmt = $connexion->prepare($requete);
@@ -155,7 +153,6 @@
 		 $user_id=$_POST['userid'];
 		 $activity_id=$_POST['activityid'];
 		 $requete="INSERT INTO liked VALUES(?,?)";
-		 //echo $requete;
 		 $stmt = $connexion->prepare($requete);
 		 $stmt->execute(array($user_id, $activity_id));
 		 $tab[0]="OK";
@@ -166,13 +163,13 @@
 	 }
  }
 
- function activityUnliked(){
+ function activityUnLiked(){
 	 global $connexion,$tab;
 	try{
 		 $user_id=$_POST['userid'];
 		 $activity_id=$_POST['activityid'];
+
 		 $requete="DELETE FROM liked WHERE user_id=? AND activity_id=?";
-		 //echo $requete;
 		 $stmt = $connexion->prepare($requete);
 		 $stmt->execute(array($user_id, $activity_id));
 		 $tab[0]="OK";

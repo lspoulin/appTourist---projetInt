@@ -116,6 +116,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         liked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                for(Landmark l : landmarkList){
+                    if(l.getId()==landmark.getId()){
+                        l.setLiked(!l.isLiked());
+                    }
+                }
                 landmark.setLiked(!landmark.isLiked());
                 if(landmark.isLiked()) {
                     liked.setImageResource(R.drawable.heartfilled);
@@ -123,17 +128,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 else {
                     liked.setImageResource(R.drawable.heartoutline);
                 }
-                Intent i  = new Intent(MainActivity.this, ServerActivity.class);
-                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LANDMARK_LIKED);
-                i.putExtra(ServerActivity.PARAM_LANDMARK, (Parcelable)landmark);
-                startActivityForResult(i, CODE_LANDMARK_LIKED);
-
-
+                likeLandmark(landmark);
             }
         });
 
         dialog.show();
 
+    }
+
+    private void likeLandmark(Landmark landmark) {
+        Intent i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LANDMARK_LIKED);
+        i.putExtra(ServerActivity.PARAM_LANDMARK, (Parcelable)landmark);
+        startActivityForResult(i, CODE_LANDMARK_LIKED);
+
+    }
+
+    private void loadLandmarks() {
+        Intent i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(i, CODE_LIST_LANDMARK);
+        overridePendingTransition(0,0);
+    }
+
+    private void loadLandmarkById(int id) {
+        Intent i  = new Intent(MainActivity.this, ServerActivity.class);
+        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_GET_LANDMARK);
+        i.putExtra(ServerActivity.PARAM_LANDMARK_ID,id );
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivityForResult(i, CODE_GET_LANDMARK);
+        overridePendingTransition(0,0);
     }
 
     @Override
@@ -149,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_OK){
             UserManager.getInstance().setUser((User)intent.getParcelableExtra(ServerActivity.USER));
             Toast.makeText(this, "Login successful for user : " + UserManager.getInstance().getUser().getName(), Toast.LENGTH_LONG).show();
+            loadLandmarks();
         }
         if(requestCode == CODE_CREATE_NEW_USER && resultCode == ServerActivity.RESULT_OK){
             UserManager.getInstance().setUser((User)intent.getParcelableExtra(ServerActivity.USER));
@@ -175,6 +201,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     }
+
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -207,32 +237,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mainListView.setAdapter(customAdapter);
 
 
-        Intent i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, CODE_LIST_LANDMARK);
-        overridePendingTransition(0,0);
-
-        /*i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_WITH_TAGS);
-        i.putExtra(ServerActivity.PARAM_LANDMARK_TAGS,"sport" );
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, CODE_LIST_LANDMARK_WITH_TAGS);*/
+        loadLandmarks();
 
         mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i  = new Intent(MainActivity.this, ServerActivity.class);
-                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_GET_LANDMARK);
-                i.putExtra(ServerActivity.PARAM_LANDMARK_ID,landmarkList.get(position).getId() );
-                i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivityForResult(i, CODE_GET_LANDMARK);
-                overridePendingTransition(0,0);
-
+                loadLandmarkById(landmarkList.get(position).getId());
             }
         });
 
     }
+
+
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
@@ -244,9 +260,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if(view.getId() == R.id.btnFav){
             try {
+                ArrayList<Landmark> landmarkLiked = new ArrayList<Landmark>();
                 for (Landmark l : landmarkList) {
-
+                    if(l.isLiked())
+                    landmarkLiked.add(l);
                 }
+                landmarkList = landmarkLiked;
                 customAdapter.notifyDataSetChanged();
             }
             catch (Exception e){
