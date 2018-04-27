@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerActivity extends AppCompatActivity {
-    public static final boolean LOCAL_SERVER = false;
+    public static final boolean LOCAL_SERVER = true;
     public static final String CONTROLLEUR_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/PHP/";
     public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "activityControleurJSON.php";
     public static final String CONTROLLEUR_USER_ENDPOINT = "userControleurJSON.php";
@@ -68,6 +68,7 @@ public class ServerActivity extends AppCompatActivity {
     public static final String PARAM_NEW_USER_USER = "com.example.lspoulin.montrealapp.ServerActivity.service.paramUser";
     public static final String PARAM_NEW_USER_PASSWORD = "com.example.lspoulin.montrealapp.ServerActivity.service.parampassword";
     public static final String PARAM_NEW_USER_EMAIL = "com.example.lspoulin.montrealapp.ServerActivity.service.paramemail";
+    public static final String PARAM_NEW_USER_PREFERENCES = "com.example.lspoulin.montrealapp.ServerActivity.service.prampreferences";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +112,8 @@ public class ServerActivity extends AppCompatActivity {
                     user = intent.getStringExtra(PARAM_NEW_USER_USER);
                     password = intent.getStringExtra(PARAM_NEW_USER_PASSWORD);
                     email = intent.getStringExtra(PARAM_NEW_USER_EMAIL);
-                    createNewUser(user,password,email);
+                    tags = intent.getStringExtra(PARAM_NEW_USER_PREFERENCES);
+                    createNewUser(user,password,email, tags);
                     break;
                 default:
                     resultNotOk();
@@ -121,7 +123,7 @@ public class ServerActivity extends AppCompatActivity {
             resultNotOk();
     }
 
-    private void createNewUser(final String name, final String password, final String email) {
+    private void createNewUser(final String name, final String password, final String email, final String preferences) {
         StringRequest requete = new StringRequest(Request.Method.POST, getControllerUser(),
                 new Response.Listener<String>() {
                     @Override
@@ -132,8 +134,13 @@ public class ServerActivity extends AppCompatActivity {
                             JSONArray jsonResponse = new JSONArray(response);
                             String msg = jsonResponse.getString(0);
                             if(msg.equals("OK")){
-                                JSONObject unUser;
+                                User user = new User();
+                                user.setPreferences(preferences);
+                                user.setEmail(email);
+                                user.setName(name);
+                                user.setId(jsonResponse.getInt(1));
                                 Intent result = new Intent();
+                                result.putExtra(USER, (Parcelable)user);
                                 resultOk(result);
                             }
                             else{
@@ -160,7 +167,7 @@ public class ServerActivity extends AppCompatActivity {
                 params.put("name", name);
                 params.put("password", md5(password));
                 params.put("email", email);
-                params.put("preferences", "sport");
+                params.put("preferences", preferences);
                 return params;
             }
         };

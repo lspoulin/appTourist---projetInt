@@ -17,6 +17,7 @@
 		 $stmt->execute(array($name,$email,$password, $tags));
 		 $dernierID=$connexion->lastInsertId();
 		 $tab[0]="OK";
+		 $tab[1]=$dernierID;
 	 }catch (Exception $e){
 		 $tab[0]="NOK";
 	 }finally {

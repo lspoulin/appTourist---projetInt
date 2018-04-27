@@ -111,16 +111,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_OK){
-            User user = intent.getParcelableExtra(ServerActivity.USER);
-            Toast.makeText(this, "Login successful for user : " + user.getName(), Toast.LENGTH_LONG).show();
+            UserManager.getInstance().setUser((User)intent.getParcelableExtra(ServerActivity.USER));
+            Toast.makeText(this, "Login successful for user : " + UserManager.getInstance().getUser().getName(), Toast.LENGTH_LONG).show();
         }
         if(requestCode == CODE_CREATE_NEW_USER && resultCode == ServerActivity.RESULT_OK){
-            //User user = intent.getParcelableExtra(ServerActivity.USER);
-            Toast.makeText(this, "User created : " , Toast.LENGTH_LONG).show();
+            UserManager.getInstance().setUser((User)intent.getParcelableExtra(ServerActivity.USER));
+            Toast.makeText(this, "User created : "+ UserManager.getInstance().getUser().getName() , Toast.LENGTH_LONG).show();
         }
 
         if(requestCode == CODE_CREATE_NEW_USER && resultCode == ServerActivity.RESULT_CANCELED){
-            //User user = intent.getParcelableExtra(ServerActivity.USER);
             Toast.makeText(this, "User not created" , Toast.LENGTH_LONG).show();
         }
 
@@ -178,23 +177,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         startActivityForResult(i, CODE_LIST_LANDMARK);
         overridePendingTransition(0,0);
 
-        i  = new Intent(MainActivity.this, ServerActivity.class);
+        /*i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN);
         i.putExtra(ServerActivity.PARAM_LOGIN_USER,"lspoulin" );
         i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, "allo");
         i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivityForResult(i, CODE_LOGIN);
-        overridePendingTransition(0,0);
+        overridePendingTransition(0,0);*/
 
 
-        i  = new Intent(MainActivity.this, ServerActivity.class);
+        /*i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_NEW_USER);
         i.putExtra(ServerActivity.PARAM_NEW_USER_USER,"lspoulin2" );
         i.putExtra(ServerActivity.PARAM_NEW_USER_PASSWORD, "allotoi");
         i.putExtra(ServerActivity.PARAM_NEW_USER_EMAIL, "lspoulin2@gmail.com");
+        i.putExtra(ServerActivity.PARAM_NEW_USER_PREFERENCES, "sport");
         i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivityForResult(i, CODE_CREATE_NEW_USER);
-        overridePendingTransition(0,0);
+        overridePendingTransition(0,0);*/
 
         i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_WITH_TAGS);
@@ -229,7 +229,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Toast.makeText(this, "Button Fav CLicked", Toast.LENGTH_LONG). show();
 
         }else if(view.getId() == R.id.btnUser){
-            Toast.makeText(this, "Button User CLicked", Toast.LENGTH_LONG). show();
+            if (UserManager.getInstance().isLoggin()){
+                showUserSetting();
+            }
+            else{
+                showUserLogin();
+            }
 
         }else if(view.getId() == R.id.btnPref){
             Toast.makeText(this, "Button Pref CLicked", Toast.LENGTH_LONG). show();
@@ -239,6 +244,75 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
         }
+    }
+
+    private void showUserSetting() {
+        Toast.makeText(this, "Show user settings", Toast.LENGTH_LONG). show();
+    }
+
+    private void showUserLogin() {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.showuserlogin);
+        dialog.setTitle("Login");
+
+        // set the custom dialog components - text, image and button
+        final View layoutLogin = (View) dialog.findViewById(R.id.login);
+        final TextView usernameLogin = (TextView) dialog.findViewById(R.id.editUserNameLogin);
+        final TextView passwordLogin = (TextView) dialog.findViewById(R.id.editPAsswordLogin);
+        final Button login = (Button) dialog.findViewById(R.id.buttonLogin);
+        final Button showSignup = (Button) dialog.findViewById(R.id.buttonShowSignup);
+
+        final View layoutCreate = (View) dialog.findViewById(R.id.createuser);
+        final TextView email = (TextView) dialog.findViewById(R.id.editEmail);
+        final TextView username = (TextView) dialog.findViewById(R.id.editUserName);
+        final TextView password = (TextView) dialog.findViewById(R.id.editPassword);
+        final TextView confirm = (TextView) dialog.findViewById(R.id.editConfirm);
+        final Button signup = (Button) dialog.findViewById(R.id.buttonCreate);
+
+
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i;
+                i  = new Intent(MainActivity.this, ServerActivity.class);
+                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN);
+                i.putExtra(ServerActivity.PARAM_LOGIN_USER,usernameLogin.getText().toString());
+                i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, passwordLogin.getText().toString());
+                i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivityForResult(i, CODE_LOGIN);
+                overridePendingTransition(0,0);
+                dialog.dismiss();
+            }
+        });
+
+        showSignup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                layoutLogin.setVisibility(View.GONE);
+                layoutCreate.setVisibility(View.VISIBLE);
+            }
+        });
+
+        signup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i;
+                i  = new Intent(MainActivity.this, ServerActivity.class);
+                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_NEW_USER);
+                i.putExtra(ServerActivity.PARAM_NEW_USER_USER, username.getText().toString() );
+                i.putExtra(ServerActivity.PARAM_NEW_USER_PASSWORD, password.getText().toString());
+                i.putExtra(ServerActivity.PARAM_NEW_USER_EMAIL, email.getText().toString());
+                i.putExtra(ServerActivity.PARAM_NEW_USER_PREFERENCES, "");
+                i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivityForResult(i, CODE_CREATE_NEW_USER);
+                overridePendingTransition(0,0);
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
     }
 
     class CustomAdapter extends BaseAdapter {
