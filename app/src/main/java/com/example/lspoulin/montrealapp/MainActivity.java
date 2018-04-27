@@ -95,6 +95,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void showLandmark(final Landmark landmark) {
 
+        Intent i;
+        i  = new Intent(MainActivity.this, LandmarkActivity.class);
+        i.putExtra("Landmark", (Parcelable) landmark);
+
+
+
+        startActivity(i);
+
+        /*
+
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.showlandmark);
         dialog.setTitle(landmark.getTitle());
@@ -155,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        dialog.show();
+        dialog.show();*/
 
     }
 
