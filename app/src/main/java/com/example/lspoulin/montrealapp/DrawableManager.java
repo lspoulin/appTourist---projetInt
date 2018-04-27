@@ -1,6 +1,10 @@
 package com.example.lspoulin.montrealapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Base64;
 
 import java.util.HashMap;
 
@@ -33,4 +37,5 @@ public class DrawableManager {
         else
             drawablelist.put(key, drawable);
     }
+
 }

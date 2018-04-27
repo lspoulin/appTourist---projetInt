@@ -2,6 +2,10 @@ package com.example.lspoulin.montrealapp;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -9,6 +13,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,8 +30,20 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
 
@@ -124,11 +142,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 landmark.setLiked(!landmark.isLiked());
                 if(landmark.isLiked()) {
                     liked.setImageResource(R.drawable.heartfilled);
+                    landmarkLiked(UserManager.getInstance().getUser().getId(), landmark.getId());
                 }
                 else {
                     liked.setImageResource(R.drawable.heartoutline);
+                    landmarkUnliked(UserManager.getInstance().getUser().getId(), landmark.getId());
                 }
-                likeLandmark(landmark);
             }
         });
 
@@ -136,29 +155,227 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    private void likeLandmark(Landmark landmark) {
-        Intent i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LANDMARK_LIKED);
-        i.putExtra(ServerActivity.PARAM_LANDMARK, (Parcelable)landmark);
-        startActivityForResult(i, CODE_LANDMARK_LIKED);
+    private void landmarkUnliked(final int userid, final int landmarkid) {
+        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                //Intent result = new Intent();
+                                //resultOk(result);
+                            }
+                            else{
+                                //resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            //resultNotOk();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //resultNotOk();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les   parametres pour POST
+                params.put("action", "activityUnLiked");
+                params.put("userid", String.valueOf(userid));
+                params.put("activityid", String.valueOf(landmarkid));
 
+                Log.d("Unliked param", String.valueOf(userid) + " " + String.valueOf(landmarkid));
+
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
+    }
+
+    private void landmarkLiked(final int userid, final int landmarkid) {
+        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                Intent result = new Intent();
+                                //resultOk(result);
+                            }
+                            else{
+                                //resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            //resultNotOk();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //resultNotOk();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les   parametres pour POST
+                params.put("action", "activityLiked");
+                params.put("userid", String.valueOf(userid));
+                params.put("activityid", String.valueOf(landmarkid));
+
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
     }
 
     private void loadLandmarks() {
-        Intent i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, CODE_LIST_LANDMARK);
-        overridePendingTransition(0,0);
+        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                JSONObject unLandmark;
+                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
+                                for(i=1;i<jsonResponse.length();i++){
+                                    unLandmark=jsonResponse.getJSONObject(i);
+
+                                    Landmark l = new Landmark(unLandmark.getInt("id"),
+                                            unLandmark.getString("title"),
+                                            unLandmark.getString("description"),
+                                            unLandmark.getString("address"),
+                                            (float)unLandmark.getDouble("latitude"),
+                                            (float) unLandmark.getDouble("longitude"),
+                                            unLandmark.getString("url"),
+                                            (float)unLandmark.getDouble("price"),
+                                            (float)unLandmark.getDouble("distanceKM"),
+                                            "",
+                                            unLandmark.getString("tags"),
+                                            unLandmark.getInt("liked")!=0);
+                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                    landmarks.add(l);
+                                }
+
+                                landmarkList = landmarks;
+                                customAdapter.notifyDataSetChanged();
+                            }
+                            else{
+                                //resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            //resultNotOk();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //resultNotOk();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les parametres pour POST
+                params.put("action", "lister");
+                if(UserManager.getInstance().isLoggin())
+                    params.put("userid", UserManager.getInstance().getUser().getId()+"");
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
+    }
+    
+    private void loadLandmarkById(final int id){
+        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                JSONObject unLandmark;
+                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
+                                for(i=1;i<jsonResponse.length();i++){
+                                    unLandmark=jsonResponse.getJSONObject(i);
+
+                                    Landmark l = new Landmark(unLandmark.getInt("id"),
+                                            unLandmark.getString("title"),
+                                            unLandmark.getString("description"),
+                                            unLandmark.getString("address"),
+                                            (float)unLandmark.getDouble("latitude"),
+                                            (float) unLandmark.getDouble("longitude"),
+                                            unLandmark.getString("url"),
+                                            (float)unLandmark.getDouble("price"),
+                                            (float)unLandmark.getDouble("distanceKM"),
+                                            "",
+                                            unLandmark.getString("tags"),
+                                            unLandmark.getInt("liked")!=0);
+                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                    landmarks.add(l);
+                                }
+                                showLandmark(landmarks.get(0));
+                            }
+                            else{
+                                //resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            //resultNotOk();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //resultNotOk();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les parametres pour POST
+                params.put("action", "listerParId");
+                params.put("id", id+"");
+                if(UserManager.getInstance().isLoggin())
+                    params.put("userid", UserManager.getInstance().getUser().getId()+"");
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
+
     }
 
-    private void loadLandmarkById(int id) {
-        Intent i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_GET_LANDMARK);
-        i.putExtra(ServerActivity.PARAM_LANDMARK_ID,id );
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, CODE_GET_LANDMARK);
-        overridePendingTransition(0,0);
+    private Drawable getDrawableBitmapFromJSON(String encodedImage) {
+        byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        Drawable d = new BitmapDrawable(getResources(),decodedByte);
+        return d;
     }
 
     @Override
