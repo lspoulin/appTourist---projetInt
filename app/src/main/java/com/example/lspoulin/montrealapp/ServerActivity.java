@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerActivity extends AppCompatActivity {
-    public static final boolean LOCAL_SERVER = false;
+    public static final boolean LOCAL_SERVER = true;
     public static final String CONTROLLEUR_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/PHP/";
     public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "activityControleurJSON.php";
     public static final String CONTROLLEUR_USER_ENDPOINT = "userControleurJSON.php";
@@ -72,7 +72,6 @@ public class ServerActivity extends AppCompatActivity {
 
     public static final String SERVICE_LANDMARK_LIKED = "com.example.lspoulin.montrealapp.ServerActivity.service.landmark_liked";
     public static final String PARAM_LANDMARK = "com.example.lspoulin.montrealapp.ServerActivity.service.paramLandmark";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +122,7 @@ public class ServerActivity extends AppCompatActivity {
                 case SERVICE_LANDMARK_LIKED:
                     landmark = intent.getParcelableExtra(PARAM_LANDMARK);
                     int userid = UserManager.getInstance().getUser().getId();
-                    if (landmark.isLiked())
+                    if (!landmark.isLiked())
                         landmarkUnliked(userid, landmark.getId());
                     else
                         landmarkLiked(userid, landmark.getId());
@@ -169,9 +168,11 @@ public class ServerActivity extends AppCompatActivity {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 // Les   parametres pour POST
-                params.put("action", "activityUnliked");
+                params.put("action", "activityUnLiked");
                 params.put("userid", String.valueOf(userid));
                 params.put("activityid", String.valueOf(landmarkid));
+
+                Log.d("Unliked param", String.valueOf(userid) + " " + String.valueOf(landmarkid));
 
                 return params;
             }
@@ -447,7 +448,7 @@ public class ServerActivity extends AppCompatActivity {
                                             (float)unLandmark.getDouble("distanceKM"),
                                             "",
                                             unLandmark.getString("tags"),
-                                            unLandmark.getBoolean("liked"));
+                                            unLandmark.getInt("liked")!=0);
                                     l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                     landmarks.add(l);
                                 }
@@ -477,6 +478,8 @@ public class ServerActivity extends AppCompatActivity {
                 // Les parametres pour POST
                 params.put("action", "listerParId");
                 params.put("id", id+"");
+                if(UserManager.getInstance().isLoggin())
+                    params.put("userid", UserManager.getInstance().getUser().getId()+"");
                 return params;
             }
         };

@@ -6,13 +6,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageButton
+        android:id="@+id/buttonLiked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:foregroundGravity="top|right"
+        app:srcCompat="@drawable/heartoutline"
+        tools:ignore="InvalidId"
+        android:background="@null"/>
+
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="368dp"
         android:layout_height="495dp"
         android:orientation="vertical"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp"
-        tools:ignore="MissingConstraints">
+        tools:layout_editor_absoluteY="8dp">
 
         <ImageView
             android:id="@+id/imageView"
@@ -40,9 +50,9 @@
             android:gravity="start"
             android:text="TextView"
             android:textAlignment="textStart"
+            android:textColor="@color/colorAccent"
             android:textSize="18sp"
-            android:textStyle="normal"
-            android:textColor="@color/colorAccent"/>
+            android:textStyle="normal" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -51,7 +61,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical" >
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/description"
@@ -72,5 +82,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Page Web" />
+
+
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

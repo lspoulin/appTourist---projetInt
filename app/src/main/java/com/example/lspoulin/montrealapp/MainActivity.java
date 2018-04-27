@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final int CODE_GET_LANDMARK = 10003;
     public static final int CODE_LIST_LANDMARK_WITH_TAGS = 10004;
     public static final int CODE_CREATE_NEW_USER = 10005;
+    public static final int CODE_LANDMARK_LIKED = 10006;
+
     Spinner spinSortBy;
     private List<Landmark> landmarkList;
     private ListView mainListView;
@@ -80,12 +83,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         final TextView address = (TextView) dialog.findViewById(R.id.address);
         final ImageView imageView = (ImageView) dialog.findViewById(R.id.imageView);
         final Button webbutton = (Button) dialog.findViewById(R.id.buttonWeb);
+        final ImageButton liked = (ImageButton) dialog.findViewById(R.id.buttonLiked);
+
+        if(!UserManager.getInstance().isLoggin()){
+            liked.setVisibility(View.GONE);
+        }
+        else{
+            if(landmark.isLiked())
+                liked.setImageResource(R.drawable.heartfilled);
+            else
+                liked.setImageResource(R.drawable.heartoutline);
+        }
+
 
         imageView.setImageDrawable(landmark.getImage());
 
         title.setText(landmark.getTitle());
         description.setText(landmark.getDescription());
         address.setText(landmark.getAddress());
+
 
         webbutton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,6 +112,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 startActivity(i);
             }
         });
+
+        liked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                landmark.setLiked(!landmark.isLiked());
+                if(landmark.isLiked()) {
+                    liked.setImageResource(R.drawable.heartfilled);
+                }
+                else {
+                    liked.setImageResource(R.drawable.heartoutline);
+                }
+                Intent i  = new Intent(MainActivity.this, ServerActivity.class);
+                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LANDMARK_LIKED);
+                i.putExtra(ServerActivity.PARAM_LANDMARK, (Parcelable)landmark);
+                startActivityForResult(i, CODE_LANDMARK_LIKED);
+
+
+            }
+        });
+
         dialog.show();
 
     }
@@ -178,25 +214,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         overridePendingTransition(0,0);
 
         /*i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN);
-        i.putExtra(ServerActivity.PARAM_LOGIN_USER,"lspoulin" );
-        i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, "allo");
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, CODE_LOGIN);
-        overridePendingTransition(0,0);*/
-
-
-        /*i  = new Intent(MainActivity.this, ServerActivity.class);
-        i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_NEW_USER);
-        i.putExtra(ServerActivity.PARAM_NEW_USER_USER,"lspoulin2" );
-        i.putExtra(ServerActivity.PARAM_NEW_USER_PASSWORD, "allotoi");
-        i.putExtra(ServerActivity.PARAM_NEW_USER_EMAIL, "lspoulin2@gmail.com");
-        i.putExtra(ServerActivity.PARAM_NEW_USER_PREFERENCES, "sport");
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivityForResult(i, CODE_CREATE_NEW_USER);
-        overridePendingTransition(0,0);*/
-
-        /*i  = new Intent(MainActivity.this, ServerActivity.class);
         i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LIST_LANDMARK_WITH_TAGS);
         i.putExtra(ServerActivity.PARAM_LANDMARK_TAGS,"sport" );
         i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -228,9 +245,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(view.getId() == R.id.btnFav){
             try {
                 for (Landmark l : landmarkList) {
-                    if (!l.isLiked()) {
-                        landmarkList.remove(l);
-                    }
 
                 }
                 customAdapter.notifyDataSetChanged();
