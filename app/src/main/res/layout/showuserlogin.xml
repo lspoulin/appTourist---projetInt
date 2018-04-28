@@ -6,16 +6,21 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
+        tools:layout_editor_absoluteY="8dp"
+        tools:ignore="MissingConstraints">
 
         <LinearLayout
             android:id="@+id/login"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
             <TextView
@@ -44,16 +49,34 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPassword" />
-            <Button
-                android:id="@+id/buttonLogin"
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Login" />
-            <Button
-                android:id="@+id/buttonShowSignup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Sign up" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
+
+                <Button
+                    android:id="@+id/buttonShowSignup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="0.45"
+                    android:background="@color/colorAccentDark"
+                    android:text="Sign up"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/buttonLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_weight="0.45"
+                    android:background="@color/colorAccentDark"
+                    android:text="Login"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
@@ -61,6 +84,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="10dp"
             android:visibility="gone">
 
             <TextView
@@ -118,9 +145,12 @@
 
             <Button
                 android:id="@+id/buttonCreate"
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Create" />
+                android:background="@color/colorAccentDark"
+                android:text="Create"
+                android:textColor="@android:color/white" />
         </LinearLayout>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

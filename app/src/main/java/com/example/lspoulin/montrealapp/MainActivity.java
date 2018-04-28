@@ -510,7 +510,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }else if(view.getId() == R.id.btnUser){
             if (UserManager.getInstance().isLoggin()){
-                showUserSetting();
+                Intent i;
+                i  = new Intent(MainActivity.this, UserActivity.class);
             }
             else{
                 showUserLogin();
@@ -518,10 +519,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }else if(view.getId() == R.id.btnPref){
             Toast.makeText(this, "Button Pref CLicked", Toast.LENGTH_LONG). show();
+            Intent i;
+            i  = new Intent(MainActivity.this, PreferenceActivity.class);
+
+
+
+
+            startActivity(i);
+
 
         }else if(view.getId() == R.id.btnSrch){
             Toast.makeText(this, "Button Srch CLicked", Toast.LENGTH_LONG). show();
-
+            Intent i;
+            i  = new Intent(MainActivity.this, SearchActivity.class);
 
         }
     }
