@@ -598,15 +598,30 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
 
         }else if(view.getId() == R.id.btnPref){
-            Toast.makeText(this, "Button Pref CLicked", Toast.LENGTH_LONG). show();
+
+
+
+            if (UserManager.getInstance().isLoggin()){
+                Intent i;
+                i  = new Intent(MainActivity.this, PreferenceActivity.class);
+                //i.putExtra("Preference", User.getPreferences().toString());
+
+                startActivity(i);
+            }
+            else{
+                showUserLogin();
+            }
+
+
+        /*
+
             Intent i;
             i  = new Intent(MainActivity.this, PreferenceActivity.class);
-
-
-
+            //i.putExtra("Preference", User.getPreferences().toString());
 
             startActivity(i);
 
+        */
 
         }else if(view.getId() == R.id.btnSrch){
             Toast.makeText(this, "Button Srch CLicked", Toast.LENGTH_LONG). show();
