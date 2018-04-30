@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private CustomAdapter customAdapter;
     private ImageButton btnUtilisateur, btnPreference, btnFavoris, btnRecherche;
     private ProgressBar progress;
+    private Switch swtPref;
 
 
     @Override
@@ -77,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinSortBy = (Spinner) findViewById(R.id.spnSort);
         progress = (ProgressBar) findViewById(R.id.progressBar);
         progress.setVisibility(View.GONE);
+        swtPref= (Switch) findViewById(R.id.switchPref);
+
 
         btnFavoris.setOnClickListener(this);
         btnUtilisateur.setOnClickListener(this);
@@ -604,7 +608,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (UserManager.getInstance().isLoggin()){
                 Intent i;
                 i  = new Intent(MainActivity.this, PreferenceActivity.class);
+
+
+/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
+/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
+
                 //i.putExtra("Preference", User.getPreferences().toString());
+
+
+/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
+/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
+
 
                 startActivity(i);
             }
@@ -732,4 +746,199 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             return view;
         }
     }
+
+    public void affPreference(){
+        progress.setVisibility(View.VISIBLE);
+
+        final String tags = spinSortBy.getSelectedItem().toString();
+        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                JSONObject unLandmark;
+                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
+                                for(i=1;i<jsonResponse.length();i++){
+                                    unLandmark=jsonResponse.getJSONObject(i);
+
+
+                                    if((User.getPreferences().toString().contains("sport")) && (unLandmark.getString("tags").contains("sport"))){
+                                        Landmark l = new Landmark(unLandmark.getInt("id"),
+                                                unLandmark.getString("title"),
+                                                unLandmark.getString("description"),
+                                                unLandmark.getString("address"),
+                                                (float) unLandmark.getDouble("latitude"),
+                                                (float) unLandmark.getDouble("longitude"),
+                                                unLandmark.getString("url"),
+                                                (float) unLandmark.getDouble("price"),
+                                                (float) unLandmark.getDouble("distanceKM"),
+                                                "",
+                                                unLandmark.getString("tags"),
+                                                unLandmark.getInt("liked") != 0);
+                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        landmarks.add(l);
+
+                                    }else if((User.getPreferences().toString().contains("plein_air")) && (unLandmark.getString("tags").contains("plein_air"))){
+                                        Landmark l = new Landmark(unLandmark.getInt("id"),
+                                                unLandmark.getString("title"),
+                                                unLandmark.getString("description"),
+                                                unLandmark.getString("address"),
+                                                (float) unLandmark.getDouble("latitude"),
+                                                (float) unLandmark.getDouble("longitude"),
+                                                unLandmark.getString("url"),
+                                                (float) unLandmark.getDouble("price"),
+                                                (float) unLandmark.getDouble("distanceKM"),
+                                                "",
+                                                unLandmark.getString("tags"),
+                                                unLandmark.getInt("liked") != 0);
+                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        landmarks.add(l);
+                                    }
+                                    else if((User.getPreferences().toString().contains("plus_populaire")) && (unLandmark.getString("tags").contains("plus_populaire"))){
+                                        Landmark l = new Landmark(unLandmark.getInt("id"),
+                                                unLandmark.getString("title"),
+                                                unLandmark.getString("description"),
+                                                unLandmark.getString("address"),
+                                                (float) unLandmark.getDouble("latitude"),
+                                                (float) unLandmark.getDouble("longitude"),
+                                                unLandmark.getString("url"),
+                                                (float) unLandmark.getDouble("price"),
+                                                (float) unLandmark.getDouble("distanceKM"),
+                                                "",
+                                                unLandmark.getString("tags"),
+                                                unLandmark.getInt("liked") != 0);
+                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        landmarks.add(l);
+                                    }
+                                    else if((User.getPreferences().toString().contains("gastronomique")) && (unLandmark.getString("tags").contains("gastronomique"))){
+                                        Landmark l = new Landmark(unLandmark.getInt("id"),
+                                                unLandmark.getString("title"),
+                                                unLandmark.getString("description"),
+                                                unLandmark.getString("address"),
+                                                (float) unLandmark.getDouble("latitude"),
+                                                (float) unLandmark.getDouble("longitude"),
+                                                unLandmark.getString("url"),
+                                                (float) unLandmark.getDouble("price"),
+                                                (float) unLandmark.getDouble("distanceKM"),
+                                                "",
+                                                unLandmark.getString("tags"),
+                                                unLandmark.getInt("liked") != 0);
+                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        landmarks.add(l);
+                                    }
+                                    else if((User.getPreferences().toString().contains("culturelle")) && (unLandmark.getString("tags").contains("culturelle"))){
+                                        Landmark l = new Landmark(unLandmark.getInt("id"),
+                                                unLandmark.getString("title"),
+                                                unLandmark.getString("description"),
+                                                unLandmark.getString("address"),
+                                                (float) unLandmark.getDouble("latitude"),
+                                                (float) unLandmark.getDouble("longitude"),
+                                                unLandmark.getString("url"),
+                                                (float) unLandmark.getDouble("price"),
+                                                (float) unLandmark.getDouble("distanceKM"),
+                                                "",
+                                                unLandmark.getString("tags"),
+                                                unLandmark.getInt("liked") != 0);
+                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        landmarks.add(l);
+                                    }
+                                    else if((User.getPreferences().toString().contains("familier")) && (unLandmark.getString("tags").contains("familier"))){
+                                        Landmark l = new Landmark(unLandmark.getInt("id"),
+                                                unLandmark.getString("title"),
+                                                unLandmark.getString("description"),
+                                                unLandmark.getString("address"),
+                                                (float) unLandmark.getDouble("latitude"),
+                                                (float) unLandmark.getDouble("longitude"),
+                                                unLandmark.getString("url"),
+                                                (float) unLandmark.getDouble("price"),
+                                                (float) unLandmark.getDouble("distanceKM"),
+                                                "",
+                                                unLandmark.getString("tags"),
+                                                unLandmark.getInt("liked") != 0);
+                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        landmarks.add(l);
+                                    }
+                                    else if((User.getPreferences().toString().contains("recreative")) && (unLandmark.getString("tags").contains("recreative")) ){
+
+                                        Landmark l = new Landmark(unLandmark.getInt("id"),
+                                                unLandmark.getString("title"),
+                                                unLandmark.getString("description"),
+                                                unLandmark.getString("address"),
+                                                (float) unLandmark.getDouble("latitude"),
+                                                (float) unLandmark.getDouble("longitude"),
+                                                unLandmark.getString("url"),
+                                                (float) unLandmark.getDouble("price"),
+                                                (float) unLandmark.getDouble("distanceKM"),
+                                                "",
+                                                unLandmark.getString("tags"),
+                                                unLandmark.getInt("liked") != 0);
+                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        landmarks.add(l);
+
+
+                                    }else if(!(tags.equals("General")) && (unLandmark.getString("tags").contains(tags))) {
+
+                                        Landmark l = new Landmark(unLandmark.getInt("id"),
+                                                unLandmark.getString("title"),
+                                                unLandmark.getString("description"),
+                                                unLandmark.getString("address"),
+                                                (float) unLandmark.getDouble("latitude"),
+                                                (float) unLandmark.getDouble("longitude"),
+                                                unLandmark.getString("url"),
+                                                (float) unLandmark.getDouble("price"),
+                                                (float) unLandmark.getDouble("distanceKM"),
+                                                "",
+                                                unLandmark.getString("tags"),
+                                                unLandmark.getInt("liked") != 0);
+                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        landmarks.add(l);
+
+                                    }
+                                    else{}
+
+
+                                }
+
+                                landmarkList = landmarks;
+                                customAdapter.notifyDataSetChanged();
+                            }
+                            else{
+                                //resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            //resultNotOk();
+                        }
+                        finally {
+                            progress.setVisibility(View.GONE);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //resultNotOk();
+                        progress.setVisibility(View.GONE);
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les parametres pour POST
+                params.put("action", "lister");
+                if(UserManager.getInstance().isLoggin())
+                    params.put("userid", UserManager.getInstance().getUser().getId()+"");
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
+    }
+
+
 }

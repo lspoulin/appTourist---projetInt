@@ -21,7 +21,7 @@ public class PreferenceActivity extends AppCompatActivity {
 
     private Switch stRestaurant, stCulturel, stSport , stFamille,stPleinAir , stRecre, stPopulaire;
     private Button btnSave;
-    private String listPref ;
+    private String listPref, newPref ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +42,73 @@ public class PreferenceActivity extends AppCompatActivity {
         btnSave = (Button)findViewById(R.id.btnSauv);
 
 
+
         loadPref(listPref);
+
+        newPref = "";
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(stSport.isChecked()){
+
+                    newPref += "sport, ";
+
+                }
+                if(stRestaurant.isChecked()){
+                    newPref += "gastronomique, ";
+
+                }
+                if(stCulturel.isChecked()){
+
+                    newPref += "culturelle, ";
+
+                }
+                if(stPleinAir.isChecked()){
+                    newPref += "plein_air, ";
+
+                }
+                if(stPopulaire.isChecked()){
+
+                    newPref += "plus_populaire, ";
+
+                }
+                if(stRecre.isChecked()){
+
+                    newPref += "recreative, ";
+
+                }
+                if(stFamille.isChecked()){
+                    newPref += "familier, ";
+
+                }
+
+/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SAUVEGARDER LES NOUVEVELLES PREFERENCES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
+/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SAUVEGARDER LES NOUVEVELLES PREFERENCES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
+
+                //User.setPreferences(newPref);
+
+
+/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SAUVEGARDER LES NOUVEVELLES PREFERENCES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
+/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SAUVEGARDER LES NOUVEVELLES PREFERENCES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
+
+
+
+                Intent i = new Intent();
+                i  = new Intent(PreferenceActivity.this, MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivityIfNeeded(i, 0);
+
+                finish();
+            }
+        });
 
 
 
     }
+
+
 
     public void loadPref(String listPref) {
         

@@ -77,22 +77,18 @@
                 android:layout_height="23dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="20dp"
-                android:layout_weight="0.80"
+                android:layout_weight="0.70"
                 android:background="@android:color/white" />
 
-            <TextView
-                android:id="@+id/txtTemp"
+            <Switch
+                android:id="@+id/switchPref"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="25dp"
                 android:layout_marginTop="20dp"
-                android:layout_weight="1"
-                android:text="36C"
-                android:textAlignment="viewEnd"
+                android:layout_weight="0.30"
+                android:text="Preference"
                 android:textColor="@android:color/white"
-                android:textSize="18sp"
-                android:gravity="end"
-                android:layout_marginRight="25dp" />
+                android:textColorLink="?attr/colorPrimary" />
 
         </LinearLayout>
 
