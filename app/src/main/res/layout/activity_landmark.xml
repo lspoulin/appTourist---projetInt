@@ -16,6 +16,7 @@
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
         android:layout_height="75dp"
+        android:layout_weight="1"
         android:layout_width="match_parent">
 
         <TextView
@@ -26,6 +27,7 @@
             android:layout_marginTop="20dp"
             android:fontFamily="sans-serif"
             android:text="App Touristique"
+            android:layout_weight="0.90"
             android:textAlignment="textStart"
             android:textColor="@android:color/white"
             android:textSize="20sp"
@@ -39,6 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp"
+            android:layout_weight="0.10"
             android:background="@color/colorPrimary"
             app:srcCompat="@drawable/usercinqante"
             android:layout_marginRight="20dp" />

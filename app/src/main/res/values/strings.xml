@@ -3,13 +3,12 @@
     <string name="action_settings">Settings</string>
     <string-array name="sort_activity">
         <item>General</item>
-        <item>Polulariter</item>
-        <item>Preference</item>
+        <item>Populaire</item>
         <item>Restaurant</item>
         <item>Plein Air</item>
         <item>Sportive</item>
-        <item>Musicale</item>
+        <item>Familiale</item>
         <item>Culturelle</item>
-        <item>Arts</item>
+        <item>Recreative</item>
     </string-array>
 </resources>

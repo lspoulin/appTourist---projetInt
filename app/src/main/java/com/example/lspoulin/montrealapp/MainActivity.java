@@ -257,8 +257,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Volley.newRequestQueue(this).add(requete);
     }
 
-    private void loadLandmarks() {
+    private void loadLandmarks(String tag) {
         progress.setVisibility(View.VISIBLE);
+
+        final String tags = tag;
         StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
                 new Response.Listener<String>() {
                     @Override
@@ -274,20 +276,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 for(i=1;i<jsonResponse.length();i++){
                                     unLandmark=jsonResponse.getJSONObject(i);
 
-                                    Landmark l = new Landmark(unLandmark.getInt("id"),
-                                            unLandmark.getString("title"),
-                                            unLandmark.getString("description"),
-                                            unLandmark.getString("address"),
-                                            (float)unLandmark.getDouble("latitude"),
-                                            (float) unLandmark.getDouble("longitude"),
-                                            unLandmark.getString("url"),
-                                            (float)unLandmark.getDouble("price"),
-                                            (float)unLandmark.getDouble("distanceKM"),
-                                            "",
-                                            unLandmark.getString("tags"),
-                                            unLandmark.getInt("liked")!=0);
-                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
-                                    landmarks.add(l);
+                                    if(unLandmark.getString("tags").contains(tags)) {
+
+                                        Landmark l = new Landmark(unLandmark.getInt("id"),
+                                                unLandmark.getString("title"),
+                                                unLandmark.getString("description"),
+                                                unLandmark.getString("address"),
+                                                (float) unLandmark.getDouble("latitude"),
+                                                (float) unLandmark.getDouble("longitude"),
+                                                unLandmark.getString("url"),
+                                                (float) unLandmark.getDouble("price"),
+                                                (float) unLandmark.getDouble("distanceKM"),
+                                                "",
+                                                unLandmark.getString("tags"),
+                                                unLandmark.getInt("liked") != 0);
+                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        landmarks.add(l);
+
+                                    }else{}
                                 }
 
                                 landmarkList = landmarks;
@@ -410,7 +416,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_OK){
             UserManager.getInstance().setUser((User)intent.getParcelableExtra(ServerActivity.USER));
             Toast.makeText(this, "Login successful for user : " + UserManager.getInstance().getUser().getName(), Toast.LENGTH_LONG).show();
-            loadLandmarks();
+            String tag ;
+            if(spinSortBy.getSelectedItem().toString().equals("Populaire")){
+
+                tag = "plus_populaire";
+
+            }else if(spinSortBy.getSelectedItem().toString().equals("Restaurant")){
+
+                tag = "gastronomique";
+            }
+            else if(spinSortBy.getSelectedItem().toString().equals("Plein Air")){
+
+                tag = "plein_air";
+            }
+            else if(spinSortBy.getSelectedItem().toString().equals("Sportive")){
+
+                tag = "sport";
+            }
+            else if(spinSortBy.getSelectedItem().toString().equals("Familiale")){
+
+                tag = "familier";
+
+            }else if(spinSortBy.getSelectedItem().toString().equals("Culturelle")){
+
+                tag = "culturelle";
+
+            }else if(spinSortBy.getSelectedItem().toString().equals("Recreative")){
+
+                tag = "recreative";
+            }else{
+                tag = "" ;
+
+            }
+            loadLandmarks(tag);
         }
         if(requestCode == CODE_CREATE_NEW_USER && resultCode == ServerActivity.RESULT_OK){
             UserManager.getInstance().setUser((User)intent.getParcelableExtra(ServerActivity.USER));
@@ -467,13 +505,46 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
 
-
+        String tag ;
         mainListView = (ListView) findViewById(R.id.listAct);
         customAdapter = new CustomAdapter();
         mainListView.setAdapter(customAdapter);
 
+        if(spinSortBy.getSelectedItem().toString().equals("Populaire")){
 
-        loadLandmarks();
+           tag = "plus_populaire";
+
+        }else if(spinSortBy.getSelectedItem().toString().equals("Restaurant")){
+
+            tag = "gastronomique";
+        }
+        else if(spinSortBy.getSelectedItem().toString().equals("Plein Air")){
+
+            tag = "plein_air";
+        }
+        else if(spinSortBy.getSelectedItem().toString().equals("Sportive")){
+
+            tag = "sport";
+        }
+        else if(spinSortBy.getSelectedItem().toString().equals("Familiale")){
+
+            tag = "familier";
+
+        }else if(spinSortBy.getSelectedItem().toString().equals("Culturelle")){
+
+            tag = "culturelle";
+
+        }else if(spinSortBy.getSelectedItem().toString().equals("Recreative")){
+
+            tag = "recreative";
+        }else{
+            tag = "" ;
+
+        }
+
+
+
+        loadLandmarks(tag);
 
         mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
@@ -503,6 +574,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
                 landmarkList = landmarkLiked;
                 customAdapter.notifyDataSetChanged();
+
+                /*
+                Intent i;
+                i  = new Intent(MainActivity.this, FavoriteActivity.class);
+                i.putExtra("Landmark", (Parcelable) landmarkList);
+
+                startActivity(i);*/
+
+
             }
             catch (Exception e){
 

@@ -18,10 +18,7 @@ public class PreferenceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preference);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.sort_activity, android.R.layout.simple_list_item_1);
 
-        ListView listView = (ListView) findViewById(R.id.listPref);
-        listView.setAdapter(adapter);
 
     }
 

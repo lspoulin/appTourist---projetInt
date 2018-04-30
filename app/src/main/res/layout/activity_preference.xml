@@ -11,42 +11,200 @@
 
         <LinearLayout
 
-            android:layout_width="match_parent"
-            android:layout_height="75dp"
             android:background="@color/colorPrimary"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_height="75dp"
+            android:layout_width="match_parent">
 
             <TextView
                 android:id="@+id/txtTitle"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
+                android:layout_height="match_parent"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:fontFamily="sans-serif"
-                android:gravity="start"
                 android:text="App Touristique"
+                android:layout_weight="0.90"
                 android:textAlignment="textStart"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_marginLeft="20dp"
+                android:gravity="start" />
 
             <ImageButton
                 android:id="@+id/btnUser"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
+                android:layout_weight="0.10"
                 android:background="@color/colorPrimary"
-                app:srcCompat="@drawable/usercinqante" />
+                app:srcCompat="@drawable/usercinqante"
+                android:layout_marginRight="20dp" />
 
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/listPref"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtRestaurant"
+                android:layout_width="150dp"
+                android:textColor="@color/colorAccentDark"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:layout_height="wrap_content"
+                android:text="Restaurant : " />
+
+            <Switch
+                android:id="@+id/swtRestaurant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/txtPleinAir"
+                android:layout_width="150dp"
+                android:textColor="@color/colorAccentDark"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:layout_height="wrap_content"
+                android:text="Plein Air : " />
+
+            <Switch
+                android:id="@+id/swtPleinAir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+        </LinearLayout>
+
+        <LinearLayout
+        android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="15dp"
+        android:orientation="horizontal">
+            <TextView
+                android:id="@+id/txtSport"
+                android:layout_width="150dp"
+                android:textColor="@color/colorAccentDark"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:layout_height="wrap_content"
+                android:text="Sportive : " />
+
+            <Switch
+                android:id="@+id/swtSport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/txtFam"
+                android:layout_width="150dp"
+                android:textColor="@color/colorAccentDark"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:layout_height="wrap_content"
+                android:text="Familiale : " />
+
+            <Switch
+                android:id="@+id/swtFam"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/txtCult"
+                android:layout_width="150dp"
+                android:textColor="@color/colorAccentDark"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:layout_height="wrap_content"
+                android:text="Culturelle : " />
+
+            <Switch
+                android:id="@+id/swtCult"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/txtRecre"
+                android:layout_width="150dp"
+                android:textColor="@color/colorAccentDark"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:layout_height="wrap_content"
+                android:text="Recreatif : " />
+
+            <Switch
+                android:id="@+id/swtRecre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="35dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="35dp"
+            android:orientation="horizontal">
+
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimaryDark"
+                android:text="Sauvegarder"
+                android:textStyle="bold"
+                android:textColor="@android:color/white" />
+
+
+        </LinearLayout>
+
 
 
     </LinearLayout>
