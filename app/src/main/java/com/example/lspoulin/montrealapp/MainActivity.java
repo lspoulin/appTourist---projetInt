@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -47,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     public static final int CODE_LIST_LANDMARK = 10001;
     public static final int CODE_LOGIN = 10002;
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinSortBy.setAdapter(spinAdapter);
         spinSortBy.setOnItemSelectedListener(this);
+        swtPref.setOnCheckedChangeListener(this);
 
 
     }
@@ -546,7 +548,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }
 
+        if(swtPref.isChecked()){
 
+            if(UserManager.getInstance().isLoggin()){
+                affPreference(tag);
+
+            }
+        }else{
+            loadLandmarks(tag);
+
+        }
 
         loadLandmarks(tag);
 
@@ -714,6 +725,55 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        String tag ;
+
+        if(spinSortBy.getSelectedItem().toString().equals("Populaire")){
+
+            tag = "plus_populaire";
+
+        }else if(spinSortBy.getSelectedItem().toString().equals("Restaurant")){
+
+            tag = "gastronomique";
+        }
+        else if(spinSortBy.getSelectedItem().toString().equals("Plein Air")){
+
+            tag = "plein_air";
+        }
+        else if(spinSortBy.getSelectedItem().toString().equals("Sportive")){
+
+            tag = "sport";
+        }
+        else if(spinSortBy.getSelectedItem().toString().equals("Familiale")){
+
+            tag = "familier";
+
+        }else if(spinSortBy.getSelectedItem().toString().equals("Culturelle")){
+
+            tag = "culturelle";
+
+        }else if(spinSortBy.getSelectedItem().toString().equals("Récréative")){
+
+            tag = "recreative";
+        }else{
+            tag = "" ;
+
+        }
+
+        if(swtPref.isChecked()){
+            if(UserManager.getInstance().isLoggin()){
+                affPreference(tag);
+
+            }
+
+        }else{
+
+            loadLandmarks(tag);
+        }
+
+    }
+
     class CustomAdapter extends BaseAdapter {
 
         @Override
@@ -747,10 +807,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    public void affPreference(){
+    public void affPreference(String tag){
         progress.setVisibility(View.VISIBLE);
 
-        final String tags = spinSortBy.getSelectedItem().toString();
+        final String tags = tag;
         StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
                 new Response.Listener<String>() {
                     @Override
@@ -939,6 +999,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         };
         Volley.newRequestQueue(this).add(requete);
     }
+
+
 
 
 }

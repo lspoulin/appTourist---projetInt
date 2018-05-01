@@ -84,14 +84,9 @@ public class PreferenceActivity extends AppCompatActivity {
 
                 }
 
-/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SAUVEGARDER LES NOUVEVELLES PREFERENCES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
-/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SAUVEGARDER LES NOUVEVELLES PREFERENCES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
-
                 //User.setPreferences(newPref);
 
 
-/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SAUVEGARDER LES NOUVEVELLES PREFERENCES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
-/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SAUVEGARDER LES NOUVEVELLES PREFERENCES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
 
 
@@ -114,7 +109,7 @@ public class PreferenceActivity extends AppCompatActivity {
         
 
 
-        listPref = "sport, recreatif, plus_populaire";
+
 
 
             if(listPref.contains("sport")){
