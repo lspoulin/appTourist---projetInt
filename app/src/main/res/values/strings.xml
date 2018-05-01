@@ -2,13 +2,13 @@
     <string name="app_name">Montrealapp</string>
     <string name="action_settings">Settings</string>
     <string-array name="sort_activity">
-        <item>General</item>
+        <item>Général</item>
         <item>Populaire</item>
         <item>Restaurant</item>
         <item>Plein Air</item>
         <item>Sportive</item>
         <item>Familiale</item>
         <item>Culturelle</item>
-        <item>Recreative</item>
+        <item>Récréative</item>
     </string-array>
 </resources>

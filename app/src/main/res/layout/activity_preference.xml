@@ -52,14 +52,15 @@
             android:layout_marginTop="20dp"
             android:layout_marginRight="15dp"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/txtPopu"
                 android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="Popularité : "
                 android:textColor="@color/colorAccentDark"
                 android:textSize="18dp"
-                android:textStyle="bold"
-                android:layout_height="wrap_content"
-                android:text="Populariter : " />
+                android:textStyle="bold" />
 
             <Switch
                 android:id="@+id/swtPopu"
@@ -191,14 +192,15 @@
             android:layout_marginTop="20dp"
             android:layout_marginRight="15dp"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/txtRecre"
                 android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="Récréatif : "
                 android:textColor="@color/colorAccentDark"
                 android:textSize="18dp"
-                android:textStyle="bold"
-                android:layout_height="wrap_content"
-                android:text="Recreatif : " />
+                android:textStyle="bold" />
 
             <Switch
                 android:id="@+id/swtRecre"
