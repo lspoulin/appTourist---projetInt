@@ -445,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 tag = "culturelle";
 
-            }else if(spinSortBy.getSelectedItem().toString().equals("Recreative")){
+            }else if(spinSortBy.getSelectedItem().toString().equals("Récréative")){
 
                 tag = "recreative";
             }else{
@@ -538,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             tag = "culturelle";
 
-        }else if(spinSortBy.getSelectedItem().toString().equals("Recreative")){
+        }else if(spinSortBy.getSelectedItem().toString().equals("Récréative")){
 
             tag = "recreative";
         }else{
@@ -613,7 +613,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 /*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
 /*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
 
-                //i.putExtra("Preference", User.getPreferences().toString());
+                i.putExtra("Preference", User.getPreferences().toString());
 
 
 /*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
