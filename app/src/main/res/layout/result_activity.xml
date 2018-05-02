@@ -16,20 +16,30 @@
         android:layout_height="75dp"
         android:layout_width="match_parent">
 
+        <ImageButton
+            android:id="@+id/btnResultBack"
+            android:layout_width="40px"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:layout_weight="0.10"
+            android:layout_marginTop="15dp"
+            app:srcCompat="@drawable/back"
+            android:layout_marginLeft="15dp" />
+
         <TextView
             android:id="@+id/txtTitle"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="20dp"
             android:fontFamily="sans-serif"
-            android:text="App Touristique"
+            android:text="Resultat"
             android:layout_weight="0.90"
             android:textAlignment="textStart"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="10dp"
             android:gravity="start" />
 
         <ImageButton
