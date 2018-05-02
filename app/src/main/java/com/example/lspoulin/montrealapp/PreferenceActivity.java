@@ -3,6 +3,7 @@ package com.example.lspoulin.montrealapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -15,7 +16,19 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PreferenceActivity extends AppCompatActivity {
 
@@ -41,8 +54,6 @@ public class PreferenceActivity extends AppCompatActivity {
         stPopulaire = (Switch)findViewById(R.id.swtPopu);
         btnSave = (Button)findViewById(R.id.btnSauv);
 
-
-
         loadPref(listPref);
 
         newPref = "";
@@ -52,104 +63,115 @@ public class PreferenceActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 if(stSport.isChecked()){
-
                     newPref += "sport, ";
-
                 }
                 if(stRestaurant.isChecked()){
                     newPref += "gastronomique, ";
-
                 }
                 if(stCulturel.isChecked()){
-
                     newPref += "culturelle, ";
-
                 }
                 if(stPleinAir.isChecked()){
                     newPref += "plein_air, ";
-
                 }
                 if(stPopulaire.isChecked()){
-
                     newPref += "plus_populaire, ";
-
                 }
                 if(stRecre.isChecked()){
-
                     newPref += "recreative, ";
-
                 }
                 if(stFamille.isChecked()){
                     newPref += "familier, ";
-
                 }
-
-                //User.setPreferences(newPref);
-
-
-
-
-
-                Intent i = new Intent();
-                i  = new Intent(PreferenceActivity.this, MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivityIfNeeded(i, 0);
-
-                finish();
+                saveUserPreferences(newPref);
             }
         });
-
-
-
     }
 
-
+    private void saveUserPreferences(final String preferences) {
+        UserManager.getInstance().getUser().setPreferences(newPref);
+        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                Intent result = new Intent();
+                                result.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                resultOk(result);
+                            }
+                            else{
+                                resultNotOk();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            resultNotOk();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        resultNotOk();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les parametres pour POST
+                params.put("action", "maj");
+                params.put("id", UserManager.getInstance().getUser().getId()+"");
+                params.put("preferences", UserManager.getInstance().getUser().getPreferences());
+                params.put("email", UserManager.getInstance().getUser().getEmail());
+                params.put("name", UserManager.getInstance().getUser().getName());
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
+    }
 
     public void loadPref(String listPref) {
-        
-
-
-
-
-
             if(listPref.contains("sport")){
                 stSport.setChecked(true);
-
             }
-
             if (listPref.contains("gastronomique")){
                 stRestaurant.setChecked(true);
-
             }
             if (listPref.contains("plus_populaire")){
                 stPopulaire.setChecked(true);
-
             }
             if (listPref.contains("plein_air")){
                 stPleinAir.setChecked(true);
-
             }
             if (listPref.contains("familier")){
                   stFamille.setChecked(true);
-
             }
             if (listPref.contains("culturelle")){
                 stCulturel.setChecked(true);
-
             }
             if (listPref.contains("recreative")){
                 stRecre.setChecked(true);
-
             }
-
-
-        
-
-
-
     }
 
-    
+    private void resultNotOk(){
+        Intent result = new Intent();
+        setResult(RESULT_CANCELED, result);
+        result.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        PreferenceActivity.this.finish();
+        overridePendingTransition(0, 0);
+    }
 
+    private void resultOk(Intent result){
+        setResult(RESULT_OK, result);
+        result.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        PreferenceActivity.this.finish();
+        overridePendingTransition(0, 0);
+    }
 }
 
