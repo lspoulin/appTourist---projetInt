@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LandmarkActivity extends AppCompatActivity {
+    public static final String LANDMARK = "com.example.lspoulimn.montrealapp.landmarkActivity.landmark";
 
     private ImageButton btnBack;
 
@@ -38,7 +39,7 @@ public class LandmarkActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        final Landmark landmark = intent.getExtras().getParcelable("Landmark");
+        final Landmark landmark = intent.getExtras().getParcelable(LANDMARK);
 
 
         TextView title = (TextView)findViewById(R.id.title);

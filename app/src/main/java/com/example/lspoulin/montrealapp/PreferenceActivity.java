@@ -32,6 +32,7 @@ import java.util.Map;
 
 public class PreferenceActivity extends AppCompatActivity {
 
+    public static final String PREFERENCE = "com.exemple.lspoulin.montrealapp.PreferenceActivity.Preference";
     private Switch stRestaurant, stCulturel, stSport , stFamille,stPleinAir , stRecre, stPopulaire;
     private Button btnSave;
     private String listPref, newPref ;
@@ -44,7 +45,7 @@ public class PreferenceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_preference);
         Intent intent = getIntent();
 
-        listPref = intent.getExtras().getString("Preference");
+        listPref = intent.getExtras().getString(PREFERENCE);
 
         stRestaurant = (Switch)findViewById(R.id.swtRestaurant);
         stCulturel = (Switch)findViewById(R.id.swtCult);

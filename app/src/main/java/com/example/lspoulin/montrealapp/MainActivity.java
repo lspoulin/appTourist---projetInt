@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         Intent i;
         i  = new Intent(MainActivity.this, LandmarkActivity.class);
-        i.putExtra("Landmark", (Parcelable) landmark);
+        i.putExtra(LandmarkActivity.LANDMARK, (Parcelable) landmark);
         startActivity(i);
     }
 
@@ -426,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Intent i;
                 i  = new Intent(MainActivity.this, PreferenceActivity.class);
 
-                i.putExtra("Preference", UserManager.getInstance().getUser().getPreferences());
+                i.putExtra(PreferenceActivity.PREFERENCE, UserManager.getInstance().getUser().getPreferences());
 
                 startActivity(i);
             }
@@ -437,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
         }else if(view.getId() == R.id.btnSrch){
-            Toast.makeText(this, "Button Srch CLicked", Toast.LENGTH_LONG). show();
+            //Toast.makeText(this, "Button Srch CLicked", Toast.LENGTH_LONG). show();
             Intent i;
             i  = new Intent(MainActivity.this, SearchActivity.class);
 

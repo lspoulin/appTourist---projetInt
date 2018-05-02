@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:layout_weight="0.30"
-                android:text="Preference"
+                android:text="Préférence"
                 android:textColor="@android:color/white"
                 android:textColorLink="?attr/colorPrimary" />
 
@@ -148,7 +148,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="5dp"
                 android:layout_weight="1"
-                android:text="Preference"
+                android:text="Préférence"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textStyle="bold" />

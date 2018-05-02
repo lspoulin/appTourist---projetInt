@@ -33,7 +33,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="20dp"
             android:fontFamily="sans-serif"
-            android:text="Resultat"
+            android:text="Résultat"
             android:layout_weight="0.90"
             android:textAlignment="textStart"
             android:textColor="@android:color/white"
