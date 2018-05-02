@@ -1,5 +1,6 @@
 package com.example.lspoulin.montrealapp;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -108,8 +109,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinSortBy.setAdapter(spinAdapter);
         spinSortBy.setOnItemSelectedListener(this);
         swtPref.setOnCheckedChangeListener(this);
-
-
     }
 
     private void showLandmark(final Landmark landmark) {
@@ -118,6 +117,112 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         i  = new Intent(MainActivity.this, LandmarkActivity.class);
         i.putExtra("Landmark", (Parcelable) landmark);
         startActivity(i);
+    }
+
+    private void loginAttempt(final String username, final String password) {
+        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                JSONObject unUser;
+                                User user = new User();
+                                for(i=1;i<jsonResponse.length();i++){
+                                    unUser=jsonResponse.getJSONObject(i);
+                                    user = new User(unUser.getInt("id"),
+                                            unUser.getString("name"),
+                                            unUser.getString("email"),
+                                            unUser.getString("preferences"));
+
+                                }
+                                UserManager.getInstance().setUser(user);
+                                Toast.makeText(MainActivity.this, "Login successful for user : " + UserManager.getInstance().getUser().getName(), Toast.LENGTH_LONG).show();
+                                String tag = tagsMap.get(spinSortBy.getSelectedItem().toString());
+                                if(tag==null)tag="";
+                                loadLandmarks(tag);
+                            }
+                            else{
+                                Toast.makeText(MainActivity.this, "Login Unsucessful" , Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(MainActivity.this, "Login Unsucessful" , Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MainActivity.this, "Login Unsucessful" , Toast.LENGTH_LONG).show();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les   parametres pour POST
+                params.put("action", "login");
+                params.put("user", username);
+                params.put("password", ServerManager.md5(password));
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
+    }
+
+    private void createNewUserAttempt(final String name, final String email, final String password, final String preferences) {
+        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                User user = new User();
+                                user.setPreferences(preferences);
+                                user.setEmail(email);
+                                user.setName(name);
+                                user.setId(jsonResponse.getInt(1));
+                                UserManager.getInstance().setUser(user);
+                                Toast.makeText(MainActivity.this, "User created : "+ UserManager.getInstance().getUser().getName() , Toast.LENGTH_LONG).show();
+                            }
+                            else{
+                                Toast.makeText(MainActivity.this, "User not created" , Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(MainActivity.this, "User not created" , Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MainActivity.this, "User not created" , Toast.LENGTH_LONG).show();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les   parametres pour POST
+                params.put("action", "enregistrer");
+                params.put("name", name);
+                params.put("password", ServerManager.md5(password));
+                params.put("email", email);
+                params.put("preferences", preferences);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
     }
 
     private void landmarkUnliked(final int userid, final int landmarkid) {
@@ -357,7 +462,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        if(requestCode == CODE_LIST_LANDMARK && resultCode == ServerActivity.RESULT_OK){
+        /*if(requestCode == CODE_LIST_LANDMARK && resultCode == ServerActivity.RESULT_OK){
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
 
             landmarkList = listerLandmark;
@@ -391,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
             landmarkList = listerLandmark;
             customAdapter.notifyDataSetChanged();
-        }
+        }*/
 
     }
 
@@ -544,14 +649,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i;
-                i  = new Intent(MainActivity.this, ServerActivity.class);
-                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN);
-                i.putExtra(ServerActivity.PARAM_LOGIN_USER,usernameLogin.getText().toString());
-                i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, passwordLogin.getText().toString());
-                i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivityForResult(i, CODE_LOGIN);
-                overridePendingTransition(0,0);
+                String username = usernameLogin.getText().toString();
+                String password = passwordLogin.getText().toString();
+                loginAttempt(username, password);
+
                 dialog.dismiss();
             }
         });
@@ -567,23 +668,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i;
-                i  = new Intent(MainActivity.this, ServerActivity.class);
-                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_NEW_USER);
-                i.putExtra(ServerActivity.PARAM_NEW_USER_USER, username.getText().toString() );
-                i.putExtra(ServerActivity.PARAM_NEW_USER_PASSWORD, password.getText().toString());
-                i.putExtra(ServerActivity.PARAM_NEW_USER_EMAIL, email.getText().toString());
-                i.putExtra(ServerActivity.PARAM_NEW_USER_PREFERENCES, "");
-                i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivityForResult(i, CODE_CREATE_NEW_USER);
-                overridePendingTransition(0,0);
-                dialog.dismiss();
+                String txtusername = username.getText().toString();
+                String txtpassword = password.getText().toString();
+                String txtemail = email.getText().toString();
+                String txtconfirm = confirm.getText().toString();
+                String txtpreferences = "";
+                if (txtpassword.equals(txtconfirm)) {
+                    createNewUserAttempt(txtusername, txtemail, txtpassword, txtpreferences);
+                    dialog.dismiss();
+                }
+                else {
+                    Toast.makeText(getParent(), "Password invalid", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         dialog.show();
 
     }
+
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
