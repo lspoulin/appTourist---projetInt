@@ -10,9 +10,12 @@ import java.security.NoSuchAlgorithmException;
 public class ServerManager {
     public static final boolean LOCAL_SERVER = false;
     public static final String CONTROLLEUR_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/PHP/";
+    public static final String PHOTO_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/photos/";
     public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "activityControleurJSON.php";
     public static final String CONTROLLEUR_USER_ENDPOINT = "userControleurJSON.php";
     public static final String CONTROLLEUR_LOCAL_ENTRY_POINT = "http://10.0.2.2:8888/ProjetFinal/PHP/";
+    public static final String PHOTO_LOCAL_ENTRY_POINT = "http://10.0.2.2:8888/ProjetFinal/photos/";
+
 
     private static ServerManager instance;
     private ServerManager(){
@@ -37,6 +40,13 @@ public class ServerManager {
             return CONTROLLEUR_LOCAL_ENTRY_POINT + CONTROLLEUR_USER_ENDPOINT;
         else
             return CONTROLLEUR_ENTRY_POINT + CONTROLLEUR_USER_ENDPOINT;
+    }
+
+    public static String getPhotoURL(String image) {
+        if (LOCAL_SERVER)
+            return PHOTO_LOCAL_ENTRY_POINT + image;
+        else
+            return PHOTO_ENTRY_POINT + image;
     }
 
     public static final String md5(final String s) {
