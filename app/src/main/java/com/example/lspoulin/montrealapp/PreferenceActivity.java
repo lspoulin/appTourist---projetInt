@@ -35,6 +35,7 @@ public class PreferenceActivity extends AppCompatActivity {
     private Switch stRestaurant, stCulturel, stSport , stFamille,stPleinAir , stRecre, stPopulaire;
     private Button btnSave;
     private String listPref, newPref ;
+    private ImageButton btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +54,18 @@ public class PreferenceActivity extends AppCompatActivity {
         stRecre = (Switch)findViewById(R.id.swtRecre);
         stPopulaire = (Switch)findViewById(R.id.swtPopu);
         btnSave = (Button)findViewById(R.id.btnSauv);
+        btnBack = (ImageButton)findViewById(R.id.btnPrefBack) ;
 
         loadPref(listPref);
 
         newPref = "";
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override

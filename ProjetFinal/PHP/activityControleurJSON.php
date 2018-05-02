@@ -77,7 +77,7 @@
 			$tab[$i]['distanceKM']='0.0';
 			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir .$ligne['image']."_small.jpg"));
 			$tab[$i]['tags']=$ligne['tags'];
-			$tab[$i]['liked']=$ligne['liked'];;
+			$tab[$i]['liked']=$ligne['liked'];
 			$i++;
 		 }
 	 }catch (Exception $e){
@@ -92,7 +92,13 @@ function listerAvecTags(){
 	 $tags = $_POST['tags'];
 	 $tagsarray=explode(",",$tags);
 	 $photo_dir="../photos/";
-	 $requete="SELECT * FROM activity";
+	 if(isset($_POST['userid'])){
+	 	$user_id=$_POST['userid'];
+	 	$requete="SELECT activity.*, activity.id IN (SELECT activity.id FROM `activity` INNER JOIN liked ON liked.activity_id=activity.id WHERE liked.user_id =?) as 'liked' FROM activity";
+	 }
+	 else{
+	 	$requete="SELECT *, false as 'liked' FROM activity";
+	 }
 
 	 $length = count($tagsarray);
 	for ($i = 0; $i < $length; $i++) {
@@ -102,9 +108,17 @@ function listerAvecTags(){
 			$requete=$requete." AND INSTR(tags, ?)>0";
 	}
 
+
 	 try{
 		 $stmt = $connexion->prepare($requete);
-		 $stmt->execute($tagsarray);
+		 if(isset($_POST['userid'])){
+		 	$stmt->execute(array_merge(array($user_id),$tagsarray));
+		 }
+		 else{
+		 	$stmt->execute($tagsarray);
+		 }
+		 	
+
 		 $tab[0]="OK";
 		 $i=1;
 		 while($ligne=$stmt->fetch(PDO::FETCH_ASSOC)){
@@ -120,7 +134,7 @@ function listerAvecTags(){
 			$tab[$i]['distanceKM']='0.0';
 			$tab[$i]['image']=base64_encode(file_get_contents($photo_dir .$ligne['image']."_small.jpg"));
 			$tab[$i]['tags']=$ligne['tags'];
-			$tab[$i]['liked']=false;
+			$tab[$i]['liked']=$ligne['liked'];;
 			$i++;
 		 }
 	 }catch (Exception $e){

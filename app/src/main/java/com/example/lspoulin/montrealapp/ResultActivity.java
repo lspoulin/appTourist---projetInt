@@ -1,0 +1,27 @@
+package com.example.lspoulin.montrealapp;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ImageButton;
+
+public class ResultActivity extends AppCompatActivity {
+
+    private ImageButton btnBack;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.result_activity);
+
+        btnBack = (ImageButton)findViewById(R.id.btnResultBack) ;
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
+    }
+}
