@@ -1,13 +1,10 @@
 package com.example.lspoulin.montrealapp;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
-import java.util.Random;
 
 /**
  * Created by lspoulin on 2018-04-20.
