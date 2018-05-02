@@ -74,7 +74,8 @@
             android:id="@+id/imgLandmark"
             android:layout_width="match_parent"
             android:layout_height="155dp"
-            app:srcCompat="@color/colorAccentDark" />
+            app:srcCompat="@color/colorAccentDark"
+            android:scaleType="centerCrop"/>
 
         <LinearLayout
             android:layout_width="match_parent"
