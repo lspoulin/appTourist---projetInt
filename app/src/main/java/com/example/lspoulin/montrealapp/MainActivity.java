@@ -52,14 +52,14 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
-    public static final int CODE_LIST_LANDMARK = 10001;
+    /*public static final int CODE_LIST_LANDMARK = 10001;
     public static final int CODE_LOGIN = 10002;
     public static final int CODE_GET_LANDMARK = 10003;
     public static final int CODE_LIST_LANDMARK_WITH_TAGS = 10004;
     public static final int CODE_CREATE_NEW_USER = 10005;
-    public static final int CODE_LANDMARK_LIKED = 10006;
+    public static final int CODE_LANDMARK_LIKED = 10006;*/
 
-    Spinner spinSortBy;
+    private Spinner spinSortBy;
     private List<Landmark> landmarkList;
     private ListView mainListView;
     private CustomAdapter customAdapter;
@@ -333,20 +333,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     unLandmark=jsonResponse.getJSONObject(i);
 
                                     if(unLandmark.getString("tags").contains(tags)) {
-
-                                        Landmark l = new Landmark(unLandmark.getInt("id"),
-                                                unLandmark.getString("title"),
-                                                unLandmark.getString("description"),
-                                                unLandmark.getString("address"),
-                                                (float) unLandmark.getDouble("latitude"),
-                                                (float) unLandmark.getDouble("longitude"),
-                                                unLandmark.getString("url"),
-                                                (float) unLandmark.getDouble("price"),
-                                                (float) unLandmark.getDouble("distanceKM"),
-                                                "",
-                                                unLandmark.getString("tags"),
-                                                unLandmark.getInt("liked") != 0);
-                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
                                         landmarks.add(l);
 
                                     }else{}
@@ -402,21 +389,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 JSONObject unLandmark;
                                 ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
                                 for(i=1;i<jsonResponse.length();i++){
-                                    unLandmark=jsonResponse.getJSONObject(i);
-
-                                    Landmark l = new Landmark(unLandmark.getInt("id"),
-                                            unLandmark.getString("title"),
-                                            unLandmark.getString("description"),
-                                            unLandmark.getString("address"),
-                                            (float)unLandmark.getDouble("latitude"),
-                                            (float) unLandmark.getDouble("longitude"),
-                                            unLandmark.getString("url"),
-                                            (float)unLandmark.getDouble("price"),
-                                            (float)unLandmark.getDouble("distanceKM"),
-                                            "",
-                                            unLandmark.getString("tags"),
-                                            unLandmark.getInt("liked")!=0);
-                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                    Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
                                     landmarks.add(l);
                                 }
                                 showLandmark(landmarks.get(0));
@@ -736,10 +709,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    public void affPreference(String tag){
+    public void affPreference(final String tags){
         progress.setVisibility(View.VISIBLE);
-
-        final String tags = tag;
         StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
                 new Response.Listener<String>() {
                     @Override
@@ -754,26 +725,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 JSONObject unLandmark;
                                 ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
                                 for(i=1;i<jsonResponse.length();i++){
-                                    unLandmark=jsonResponse.getJSONObject(i);
-                                    Landmark l = new Landmark(unLandmark.getInt("id"),
-                                    unLandmark.getString("title"),
-                                    unLandmark.getString("description"),
-                                    unLandmark.getString("address"),
-                                    (float) unLandmark.getDouble("latitude"),
-                                    (float) unLandmark.getDouble("longitude"),
-                                    unLandmark.getString("url"),
-                                    (float) unLandmark.getDouble("price"),
-                                    (float) unLandmark.getDouble("distanceKM"),
-                                    "",
-                                    unLandmark.getString("tags"),
-                                    unLandmark.getInt("liked") != 0);
-                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
-                                    for (String preference :user.getUser().getPreferences().split(",")){
-                                        if(l.getTags().contains(preference)){
-                                            landmarks.add(l);
-                                            break;
-                                        }
-                                    }
+                                    Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
+                                    landmarks.add(l);
                                 }
 
                                 landmarkList = landmarks;
@@ -803,7 +756,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 // Les parametres pour POST
-                params.put("action", "lister");
+                params.put("action", "listerAvecTags");
+                params.put("tags", tags);
                 if(UserManager.getInstance().isLoggin())
                     params.put("userid", UserManager.getInstance().getUser().getId()+"");
                 return params;
@@ -812,7 +766,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Volley.newRequestQueue(this).add(requete);
     }
 
-
-
-
+    private Landmark getLandmarkFromResponse(JSONObject unLandmark) throws JSONException{
+        Landmark l = new Landmark(unLandmark.getInt("id"),
+                unLandmark.getString("title"),
+                unLandmark.getString("description"),
+                unLandmark.getString("address"),
+                (float) unLandmark.getDouble("latitude"),
+                (float) unLandmark.getDouble("longitude"),
+                unLandmark.getString("url"),
+                (float) unLandmark.getDouble("price"),
+                (float) unLandmark.getDouble("distanceKM"),
+                "",
+                unLandmark.getString("tags"),
+                unLandmark.getInt("liked") != 0);
+        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+        return l;
+    }
 }
