@@ -1,5 +1,6 @@
 package com.example.lspoulin.montrealapp;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -44,6 +45,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ImageButton btnUtilisateur, btnPreference, btnFavoris, btnRecherche;
     private ProgressBar progress;
     private Switch swtPref;
+    private Map<String, String> tagsMap = new HashMap<String, String>();
+
 
 
     @Override
@@ -82,6 +86,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         progress.setVisibility(View.GONE);
         swtPref= (Switch) findViewById(R.id.switchPref);
 
+        tagsMap.put("Populaire", "plus_populaire");
+        tagsMap.put("Restaurant", "gastronomique");
+        tagsMap.put("Populaire", "plus_populaire");
+        tagsMap.put("Plein Air", "plein_air");
+        tagsMap.put("Sportive", "sport");
+        tagsMap.put("Familiale", "familier");
+        tagsMap.put("Culturelle", "culturelle");
+        tagsMap.put("Récréative", "recreative");
+
+
 
         btnFavoris.setOnClickListener(this);
         btnUtilisateur.setOnClickListener(this);
@@ -95,8 +109,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinSortBy.setAdapter(spinAdapter);
         spinSortBy.setOnItemSelectedListener(this);
         swtPref.setOnCheckedChangeListener(this);
-
-
     }
 
     private void showLandmark(final Landmark landmark) {
@@ -104,75 +116,113 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Intent i;
         i  = new Intent(MainActivity.this, LandmarkActivity.class);
         i.putExtra("Landmark", (Parcelable) landmark);
-
-
-
         startActivity(i);
+    }
 
-        /*
+    private void loginAttempt(final String username, final String password) {
+        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                JSONObject unUser;
+                                User user = new User();
+                                for(i=1;i<jsonResponse.length();i++){
+                                    unUser=jsonResponse.getJSONObject(i);
+                                    user = new User(unUser.getInt("id"),
+                                            unUser.getString("name"),
+                                            unUser.getString("email"),
+                                            unUser.getString("preferences"));
 
-        final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.showlandmark);
-        dialog.setTitle(landmark.getTitle());
-
-        // set the custom dialog components - text, image and button
-        final TextView title = (TextView) dialog.findViewById(R.id.title);
-        final TextView description = (TextView) dialog.findViewById(R.id.description);
-        final TextView address = (TextView) dialog.findViewById(R.id.address);
-        final ImageView imageView = (ImageView) dialog.findViewById(R.id.imageView);
-        final Button webbutton = (Button) dialog.findViewById(R.id.buttonWeb);
-        final ImageButton liked = (ImageButton) dialog.findViewById(R.id.buttonLiked);
-
-        if(!UserManager.getInstance().isLoggin()){
-            liked.setVisibility(View.GONE);
-        }
-        else{
-            if(landmark.isLiked())
-                liked.setImageResource(R.drawable.heartfilled);
-            else
-                liked.setImageResource(R.drawable.heartoutline);
-        }
-
-
-        imageView.setImageDrawable(landmark.getImage());
-
-        title.setText(landmark.getTitle());
-        description.setText(landmark.getDescription());
-        address.setText(landmark.getAddress());
-
-
-        webbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String url = landmark.getUrl();
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
-            }
-        });
-
-        liked.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                for(Landmark l : landmarkList){
-                    if(l.getId()==landmark.getId()){
-                        l.setLiked(!l.isLiked());
+                                }
+                                UserManager.getInstance().setUser(user);
+                                Toast.makeText(MainActivity.this, "Login successful for user : " + UserManager.getInstance().getUser().getName(), Toast.LENGTH_LONG).show();
+                                String tag = tagsMap.get(spinSortBy.getSelectedItem().toString());
+                                if(tag==null)tag="";
+                                loadLandmarks(tag);
+                            }
+                            else{
+                                Toast.makeText(MainActivity.this, "Login Unsucessful" , Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(MainActivity.this, "Login Unsucessful" , Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MainActivity.this, "Login Unsucessful" , Toast.LENGTH_LONG).show();
                     }
                 }
-                landmark.setLiked(!landmark.isLiked());
-                if(landmark.isLiked()) {
-                    liked.setImageResource(R.drawable.heartfilled);
-                    landmarkLiked(UserManager.getInstance().getUser().getId(), landmark.getId());
-                }
-                else {
-                    liked.setImageResource(R.drawable.heartoutline);
-                    landmarkUnliked(UserManager.getInstance().getUser().getId(), landmark.getId());
-                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les   parametres pour POST
+                params.put("action", "login");
+                params.put("user", username);
+                params.put("password", ServerManager.md5(password));
+                return params;
             }
-        });
+        };
+        Volley.newRequestQueue(this).add(requete);
+    }
 
-        dialog.show();*/
-
+    private void createNewUserAttempt(final String name, final String email, final String password, final String preferences) {
+        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("RESULTAT", response);
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                User user = new User();
+                                user.setPreferences(preferences);
+                                user.setEmail(email);
+                                user.setName(name);
+                                user.setId(jsonResponse.getInt(1));
+                                UserManager.getInstance().setUser(user);
+                                Toast.makeText(MainActivity.this, "User created : "+ UserManager.getInstance().getUser().getName() , Toast.LENGTH_LONG).show();
+                            }
+                            else{
+                                Toast.makeText(MainActivity.this, "User not created" , Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(MainActivity.this, "User not created" , Toast.LENGTH_LONG).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MainActivity.this, "User not created" , Toast.LENGTH_LONG).show();
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                // Les   parametres pour POST
+                params.put("action", "enregistrer");
+                params.put("name", name);
+                params.put("password", ServerManager.md5(password));
+                params.put("email", email);
+                params.put("preferences", preferences);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(requete);
     }
 
     private void landmarkUnliked(final int userid, final int landmarkid) {
@@ -412,7 +462,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        if(requestCode == CODE_LIST_LANDMARK && resultCode == ServerActivity.RESULT_OK){
+        /*if(requestCode == CODE_LIST_LANDMARK && resultCode == ServerActivity.RESULT_OK){
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
 
             landmarkList = listerLandmark;
@@ -422,38 +472,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_OK){
             UserManager.getInstance().setUser((User)intent.getParcelableExtra(ServerActivity.USER));
             Toast.makeText(this, "Login successful for user : " + UserManager.getInstance().getUser().getName(), Toast.LENGTH_LONG).show();
-            String tag ;
-            if(spinSortBy.getSelectedItem().toString().equals("Populaire")){
-
-                tag = "plus_populaire";
-
-            }else if(spinSortBy.getSelectedItem().toString().equals("Restaurant")){
-
-                tag = "gastronomique";
-            }
-            else if(spinSortBy.getSelectedItem().toString().equals("Plein Air")){
-
-                tag = "plein_air";
-            }
-            else if(spinSortBy.getSelectedItem().toString().equals("Sportive")){
-
-                tag = "sport";
-            }
-            else if(spinSortBy.getSelectedItem().toString().equals("Familiale")){
-
-                tag = "familier";
-
-            }else if(spinSortBy.getSelectedItem().toString().equals("Culturelle")){
-
-                tag = "culturelle";
-
-            }else if(spinSortBy.getSelectedItem().toString().equals("Récréative")){
-
-                tag = "recreative";
-            }else{
-                tag = "" ;
-
-            }
+            String tag = tagsMap.get(spinSortBy.getSelectedItem().toString());
+            if(tag==null)tag="";
             loadLandmarks(tag);
         }
         if(requestCode == CODE_CREATE_NEW_USER && resultCode == ServerActivity.RESULT_OK){
@@ -474,17 +494,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         if(requestCode == CODE_LIST_LANDMARK_WITH_TAGS && resultCode == ServerActivity.RESULT_OK){
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
-
             landmarkList = listerLandmark;
             customAdapter.notifyDataSetChanged();
-        }
-
+        }*/
 
     }
-
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -511,52 +525,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
 
-        String tag ;
+
         mainListView = (ListView) findViewById(R.id.listAct);
         customAdapter = new CustomAdapter();
         mainListView.setAdapter(customAdapter);
 
-        if(spinSortBy.getSelectedItem().toString().equals("Populaire")){
-
-           tag = "plus_populaire";
-
-        }else if(spinSortBy.getSelectedItem().toString().equals("Restaurant")){
-
-            tag = "gastronomique";
-        }
-        else if(spinSortBy.getSelectedItem().toString().equals("Plein Air")){
-
-            tag = "plein_air";
-        }
-        else if(spinSortBy.getSelectedItem().toString().equals("Sportive")){
-
-            tag = "sport";
-        }
-        else if(spinSortBy.getSelectedItem().toString().equals("Familiale")){
-
-            tag = "familier";
-
-        }else if(spinSortBy.getSelectedItem().toString().equals("Culturelle")){
-
-            tag = "culturelle";
-
-        }else if(spinSortBy.getSelectedItem().toString().equals("Récréative")){
-
-            tag = "recreative";
-        }else{
-            tag = "" ;
-
-        }
-
+        String tag = tagsMap.get(spinSortBy.getSelectedItem());
+        if(tag == null) tag ="";
         if(swtPref.isChecked()){
-
             if(UserManager.getInstance().isLoggin()){
                 affPreference(tag);
-
             }
         }else{
             loadLandmarks(tag);
-
         }
 
         loadLandmarks(tag);
@@ -570,8 +551,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-
-
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
@@ -579,7 +558,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onClick(View view) {
-
         if(view.getId() == R.id.btnFav){
             try {
                 ArrayList<Landmark> landmarkLiked = new ArrayList<Landmark>();
@@ -589,15 +567,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
                 landmarkList = landmarkLiked;
                 customAdapter.notifyDataSetChanged();
-
-                /*
-                Intent i;
-                i  = new Intent(MainActivity.this, FavoriteActivity.class);
-                i.putExtra("Landmark", (Parcelable) landmarkList);
-
-                startActivity(i);*/
-
-
             }
             catch (Exception e){
 
@@ -613,18 +582,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
 
         }else if(view.getId() == R.id.btnPref){
-
-
-
             if (UserManager.getInstance().isLoggin()){
                 Intent i;
                 i  = new Intent(MainActivity.this, PreferenceActivity.class);
 
-
 /*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
 /*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
 
-                i.putExtra("Preference", User.getPreferences().toString());
+                i.putExtra("Preference", UserManager.getInstance().getUser().getPreferences());
 
 
 /*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
@@ -684,14 +649,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i;
-                i  = new Intent(MainActivity.this, ServerActivity.class);
-                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_LOGIN);
-                i.putExtra(ServerActivity.PARAM_LOGIN_USER,usernameLogin.getText().toString());
-                i.putExtra(ServerActivity.PARAM_LOGIN_PASSWORD, passwordLogin.getText().toString());
-                i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivityForResult(i, CODE_LOGIN);
-                overridePendingTransition(0,0);
+                String username = usernameLogin.getText().toString();
+                String password = passwordLogin.getText().toString();
+                loginAttempt(username, password);
+
                 dialog.dismiss();
             }
         });
@@ -707,17 +668,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i;
-                i  = new Intent(MainActivity.this, ServerActivity.class);
-                i.putExtra(ServerActivity.SERVICE, ServerActivity.SERVICE_NEW_USER);
-                i.putExtra(ServerActivity.PARAM_NEW_USER_USER, username.getText().toString() );
-                i.putExtra(ServerActivity.PARAM_NEW_USER_PASSWORD, password.getText().toString());
-                i.putExtra(ServerActivity.PARAM_NEW_USER_EMAIL, email.getText().toString());
-                i.putExtra(ServerActivity.PARAM_NEW_USER_PREFERENCES, "");
-                i.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivityForResult(i, CODE_CREATE_NEW_USER);
-                overridePendingTransition(0,0);
-                dialog.dismiss();
+                String txtusername = username.getText().toString();
+                String txtpassword = password.getText().toString();
+                String txtemail = email.getText().toString();
+                String txtconfirm = confirm.getText().toString();
+                String txtpreferences = "";
+                if (txtpassword.equals(txtconfirm)) {
+                    createNewUserAttempt(txtusername, txtemail, txtpassword, txtpreferences);
+                    dialog.dismiss();
+                }
+                else {
+                    Toast.makeText(getParent(), "Password invalid", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -725,48 +687,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-        String tag ;
-
-        if(spinSortBy.getSelectedItem().toString().equals("Populaire")){
-
-            tag = "plus_populaire";
-
-        }else if(spinSortBy.getSelectedItem().toString().equals("Restaurant")){
-
-            tag = "gastronomique";
-        }
-        else if(spinSortBy.getSelectedItem().toString().equals("Plein Air")){
-
-            tag = "plein_air";
-        }
-        else if(spinSortBy.getSelectedItem().toString().equals("Sportive")){
-
-            tag = "sport";
-        }
-        else if(spinSortBy.getSelectedItem().toString().equals("Familiale")){
-
-            tag = "familier";
-
-        }else if(spinSortBy.getSelectedItem().toString().equals("Culturelle")){
-
-            tag = "culturelle";
-
-        }else if(spinSortBy.getSelectedItem().toString().equals("Récréative")){
-
-            tag = "recreative";
-        }else{
-            tag = "" ;
-
-        }
-
+        String tag = tagsMap.get(spinSortBy.getSelectedItem());
+        if(tag == null) tag = "";
         if(swtPref.isChecked()){
             if(UserManager.getInstance().isLoggin()){
                 affPreference(tag);
-
             }
-
         }else{
 
             loadLandmarks(tag);
@@ -817,6 +746,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     public void onResponse(String response) {
                         try {
                             Log.d("RESULTAT", response);
+                            UserManager user = UserManager.getInstance();
                             int i;
                             JSONArray jsonResponse = new JSONArray(response);
                             String msg = jsonResponse.getString(0);
@@ -825,143 +755,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
                                 for(i=1;i<jsonResponse.length();i++){
                                     unLandmark=jsonResponse.getJSONObject(i);
-
-
-                                    if((User.getPreferences().toString().contains("sport")) && (unLandmark.getString("tags").contains("sport"))){
-                                        Landmark l = new Landmark(unLandmark.getInt("id"),
-                                                unLandmark.getString("title"),
-                                                unLandmark.getString("description"),
-                                                unLandmark.getString("address"),
-                                                (float) unLandmark.getDouble("latitude"),
-                                                (float) unLandmark.getDouble("longitude"),
-                                                unLandmark.getString("url"),
-                                                (float) unLandmark.getDouble("price"),
-                                                (float) unLandmark.getDouble("distanceKM"),
-                                                "",
-                                                unLandmark.getString("tags"),
-                                                unLandmark.getInt("liked") != 0);
-                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
-                                        landmarks.add(l);
-
-                                    }else if((User.getPreferences().toString().contains("plein_air")) && (unLandmark.getString("tags").contains("plein_air"))){
-                                        Landmark l = new Landmark(unLandmark.getInt("id"),
-                                                unLandmark.getString("title"),
-                                                unLandmark.getString("description"),
-                                                unLandmark.getString("address"),
-                                                (float) unLandmark.getDouble("latitude"),
-                                                (float) unLandmark.getDouble("longitude"),
-                                                unLandmark.getString("url"),
-                                                (float) unLandmark.getDouble("price"),
-                                                (float) unLandmark.getDouble("distanceKM"),
-                                                "",
-                                                unLandmark.getString("tags"),
-                                                unLandmark.getInt("liked") != 0);
-                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
-                                        landmarks.add(l);
+                                    Landmark l = new Landmark(unLandmark.getInt("id"),
+                                    unLandmark.getString("title"),
+                                    unLandmark.getString("description"),
+                                    unLandmark.getString("address"),
+                                    (float) unLandmark.getDouble("latitude"),
+                                    (float) unLandmark.getDouble("longitude"),
+                                    unLandmark.getString("url"),
+                                    (float) unLandmark.getDouble("price"),
+                                    (float) unLandmark.getDouble("distanceKM"),
+                                    "",
+                                    unLandmark.getString("tags"),
+                                    unLandmark.getInt("liked") != 0);
+                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                    for (String preference :user.getUser().getPreferences().split(",")){
+                                        if(l.getTags().contains(preference)){
+                                            landmarks.add(l);
+                                            break;
+                                        }
                                     }
-                                    else if((User.getPreferences().toString().contains("plus_populaire")) && (unLandmark.getString("tags").contains("plus_populaire"))){
-                                        Landmark l = new Landmark(unLandmark.getInt("id"),
-                                                unLandmark.getString("title"),
-                                                unLandmark.getString("description"),
-                                                unLandmark.getString("address"),
-                                                (float) unLandmark.getDouble("latitude"),
-                                                (float) unLandmark.getDouble("longitude"),
-                                                unLandmark.getString("url"),
-                                                (float) unLandmark.getDouble("price"),
-                                                (float) unLandmark.getDouble("distanceKM"),
-                                                "",
-                                                unLandmark.getString("tags"),
-                                                unLandmark.getInt("liked") != 0);
-                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
-                                        landmarks.add(l);
-                                    }
-                                    else if((User.getPreferences().toString().contains("gastronomique")) && (unLandmark.getString("tags").contains("gastronomique"))){
-                                        Landmark l = new Landmark(unLandmark.getInt("id"),
-                                                unLandmark.getString("title"),
-                                                unLandmark.getString("description"),
-                                                unLandmark.getString("address"),
-                                                (float) unLandmark.getDouble("latitude"),
-                                                (float) unLandmark.getDouble("longitude"),
-                                                unLandmark.getString("url"),
-                                                (float) unLandmark.getDouble("price"),
-                                                (float) unLandmark.getDouble("distanceKM"),
-                                                "",
-                                                unLandmark.getString("tags"),
-                                                unLandmark.getInt("liked") != 0);
-                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
-                                        landmarks.add(l);
-                                    }
-                                    else if((User.getPreferences().toString().contains("culturelle")) && (unLandmark.getString("tags").contains("culturelle"))){
-                                        Landmark l = new Landmark(unLandmark.getInt("id"),
-                                                unLandmark.getString("title"),
-                                                unLandmark.getString("description"),
-                                                unLandmark.getString("address"),
-                                                (float) unLandmark.getDouble("latitude"),
-                                                (float) unLandmark.getDouble("longitude"),
-                                                unLandmark.getString("url"),
-                                                (float) unLandmark.getDouble("price"),
-                                                (float) unLandmark.getDouble("distanceKM"),
-                                                "",
-                                                unLandmark.getString("tags"),
-                                                unLandmark.getInt("liked") != 0);
-                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
-                                        landmarks.add(l);
-                                    }
-                                    else if((User.getPreferences().toString().contains("familier")) && (unLandmark.getString("tags").contains("familier"))){
-                                        Landmark l = new Landmark(unLandmark.getInt("id"),
-                                                unLandmark.getString("title"),
-                                                unLandmark.getString("description"),
-                                                unLandmark.getString("address"),
-                                                (float) unLandmark.getDouble("latitude"),
-                                                (float) unLandmark.getDouble("longitude"),
-                                                unLandmark.getString("url"),
-                                                (float) unLandmark.getDouble("price"),
-                                                (float) unLandmark.getDouble("distanceKM"),
-                                                "",
-                                                unLandmark.getString("tags"),
-                                                unLandmark.getInt("liked") != 0);
-                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
-                                        landmarks.add(l);
-                                    }
-                                    else if((User.getPreferences().toString().contains("recreative")) && (unLandmark.getString("tags").contains("recreative")) ){
-
-                                        Landmark l = new Landmark(unLandmark.getInt("id"),
-                                                unLandmark.getString("title"),
-                                                unLandmark.getString("description"),
-                                                unLandmark.getString("address"),
-                                                (float) unLandmark.getDouble("latitude"),
-                                                (float) unLandmark.getDouble("longitude"),
-                                                unLandmark.getString("url"),
-                                                (float) unLandmark.getDouble("price"),
-                                                (float) unLandmark.getDouble("distanceKM"),
-                                                "",
-                                                unLandmark.getString("tags"),
-                                                unLandmark.getInt("liked") != 0);
-                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
-                                        landmarks.add(l);
-
-
-                                    }else if(!(tags.equals("General")) && (unLandmark.getString("tags").contains(tags))) {
-
-                                        Landmark l = new Landmark(unLandmark.getInt("id"),
-                                                unLandmark.getString("title"),
-                                                unLandmark.getString("description"),
-                                                unLandmark.getString("address"),
-                                                (float) unLandmark.getDouble("latitude"),
-                                                (float) unLandmark.getDouble("longitude"),
-                                                unLandmark.getString("url"),
-                                                (float) unLandmark.getDouble("price"),
-                                                (float) unLandmark.getDouble("distanceKM"),
-                                                "",
-                                                unLandmark.getString("tags"),
-                                                unLandmark.getInt("liked") != 0);
-                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
-                                        landmarks.add(l);
-
-                                    }
-                                    else{}
-
-
                                 }
 
                                 landmarkList = landmarks;

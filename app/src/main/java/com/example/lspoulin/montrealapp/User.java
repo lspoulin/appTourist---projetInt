@@ -37,7 +37,7 @@ public class User  implements Serializable, Parcelable {
         this.email = email;
     }
 
-    public static String getPreferences() {
+    public String getPreferences() {
         return preferences;
     }
 
