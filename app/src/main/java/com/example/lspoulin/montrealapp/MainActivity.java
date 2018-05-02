@@ -52,12 +52,6 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
-    /*public static final int CODE_LIST_LANDMARK = 10001;
-    public static final int CODE_LOGIN = 10002;
-    public static final int CODE_GET_LANDMARK = 10003;
-    public static final int CODE_LIST_LANDMARK_WITH_TAGS = 10004;
-    public static final int CODE_CREATE_NEW_USER = 10005;
-    public static final int CODE_LANDMARK_LIKED = 10006;*/
 
     private Spinner spinSortBy;
     private List<Landmark> landmarkList;
@@ -342,41 +336,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        if(requestCode == CODE_LIST_LANDMARK && resultCode == ServerActivity.RESULT_OK){
-            ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
-
-            landmarkList = listerLandmark;
-            customAdapter.notifyDataSetChanged();
-        }
-
-        if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_OK){
-            UserManager.getInstance().setUser((User)intent.getParcelableExtra(ServerActivity.USER));
-            Toast.makeText(this, "Login successful for user : " + UserManager.getInstance().getUser().getName(), Toast.LENGTH_LONG).show();
-            String tag = tagsMap.get(spinSortBy.getSelectedItem().toString());
-            if(tag==null)tag="";
-            loadLandmarks(tag);
-        }
-        if(requestCode == CODE_CREATE_NEW_USER && resultCode == ServerActivity.RESULT_OK){
-            UserManager.getInstance().setUser((User)intent.getParcelableExtra(ServerActivity.USER));
-            Toast.makeText(this, "User created : "+ UserManager.getInstance().getUser().getName() , Toast.LENGTH_LONG).show();
-        }
-
-        if(requestCode == CODE_CREATE_NEW_USER && resultCode == ServerActivity.RESULT_CANCELED){
-            Toast.makeText(this, "User not created" , Toast.LENGTH_LONG).show();
-        }
-
-        if(requestCode == CODE_LOGIN && resultCode == ServerActivity.RESULT_CANCELED){
-            Toast.makeText(this, "Login unsuccessfull", Toast.LENGTH_LONG).show();
-        }
-        if(requestCode == CODE_GET_LANDMARK && resultCode == ServerActivity.RESULT_OK){
-            ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
-            showLandmark(listerLandmark.get(0));
-        }
-        if(requestCode == CODE_LIST_LANDMARK_WITH_TAGS && resultCode == ServerActivity.RESULT_OK){
-            ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
-            landmarkList = listerLandmark;
-            customAdapter.notifyDataSetChanged();
-        }
 
     }
 
