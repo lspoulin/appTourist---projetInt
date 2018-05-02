@@ -15,6 +15,33 @@ import java.util.Random;
 //Java Bean Landmark
 
 public class Landmark implements Serializable, Parcelable {
+    public static final String TABLE_NAME = "landmarks";
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_TITLE = "title";
+    public static final String COLUMN_DESCRIPTION = "description";
+    public static final String COLUMN_ADDRESS = "address";
+    public static final String COLUMN_LATITUDE = "latitude";
+    public static final String COLUMN_LONGITUDE = "longitude";
+    public static final String COLUMN_URL = "url";
+    public static final String COLUMN_TAGS = "tags";
+    public static final String COLUMN_LIKED = "liked";
+    public static final String COLUMN_IMAGE = "image";
+
+    // Create table SQL query
+    public static final String CREATE_TABLE =
+            "CREATE TABLE " + TABLE_NAME + "("
+                    + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + COLUMN_TITLE + " VARCHAR(50),"
+                    + COLUMN_DESCRIPTION + " TEXT,"
+                    + COLUMN_ADDRESS + " VARCHAR(100),"
+                    + COLUMN_LATITUDE + " FLOAT,"
+                    + COLUMN_LONGITUDE + " FLOAT,"
+                    + COLUMN_URL + " VARCHAR(100),"
+                    + COLUMN_TAGS + " VARCHAR(100),"
+                    + COLUMN_LIKED + " BOOLEAN,"
+                    + COLUMN_IMAGE + " TEXT"
+                    + ")";
+
     private int id;
     private String title;
     private String description;
@@ -23,6 +50,9 @@ public class Landmark implements Serializable, Parcelable {
     private float latitude;
     private String url;
     private String tags;
+    private boolean liked;
+    private float price;
+    private String image;
 
     public double calculateDistanceKM(int latitude, int longitude){
         return 111.111 *
@@ -49,28 +79,17 @@ public class Landmark implements Serializable, Parcelable {
         this.liked = liked;
     }
 
-    private boolean liked;
 
-    public Drawable getImage() {
-        return DrawableManager.getInstance().getDrawable(image);
 
-    }
-
-    public void setImage(Drawable drawable) {
-        this.image = id + "";
-        DrawableManager.getInstance().addDrawable(this.image, drawable);
-
-    }
 
     public void setImage(String image) {
         this.image = image;
 
     }
 
-    //TODO : add tumbnail and normal images
-    private float price;
-
-    private String image;
+    public String getImage() {
+        return this.image;
+    }
 
     public float getDistanceKM() {
         return distanceKM;

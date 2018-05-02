@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 return params;
             }
         };
+        Log.d("requete url", requete.getUrl());
         Volley.newRequestQueue(this).add(requete);
     }
 
@@ -219,94 +220,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 params.put("password", ServerManager.md5(password));
                 params.put("email", email);
                 params.put("preferences", preferences);
-                return params;
-            }
-        };
-        Volley.newRequestQueue(this).add(requete);
-    }
-
-    private void landmarkUnliked(final int userid, final int landmarkid) {
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                //Intent result = new Intent();
-                                //resultOk(result);
-                            }
-                            else{
-                                //resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            //resultNotOk();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //resultNotOk();
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les   parametres pour POST
-                params.put("action", "activityUnLiked");
-                params.put("userid", String.valueOf(userid));
-                params.put("activityid", String.valueOf(landmarkid));
-
-                Log.d("Unliked param", String.valueOf(userid) + " " + String.valueOf(landmarkid));
-
-                return params;
-            }
-        };
-        Volley.newRequestQueue(this).add(requete);
-    }
-
-    private void landmarkLiked(final int userid, final int landmarkid) {
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                Intent result = new Intent();
-                                //resultOk(result);
-                            }
-                            else{
-                                //resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            //resultNotOk();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //resultNotOk();
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les   parametres pour POST
-                params.put("action", "activityLiked");
-                params.put("userid", String.valueOf(userid));
-                params.put("activityid", String.valueOf(landmarkid));
-
                 return params;
             }
         };
@@ -372,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 return params;
             }
         };
+        Log.d("requete url" ,requete.getUrl());
         Volley.newRequestQueue(this).add(requete);
     }
 
@@ -423,13 +337,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         };
         Volley.newRequestQueue(this).add(requete);
 
-    }
-
-    private Drawable getDrawableBitmapFromJSON(String encodedImage) {
-        byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        Drawable d = new BitmapDrawable(getResources(),decodedByte);
-        return d;
     }
 
     @Override
@@ -501,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         mainListView = (ListView) findViewById(R.id.listAct);
         customAdapter = new CustomAdapter();
+        DrawableManager.getInstance().setListener(customAdapter);
         mainListView.setAdapter(customAdapter);
 
         String tag = tagsMap.get(spinSortBy.getSelectedItem());
@@ -513,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             loadLandmarks(tag);
         }
 
-        loadLandmarks(tag);
+        //loadLandmarks(tag);
 
         mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
@@ -704,7 +612,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Landmark l = landmarkList.get(i);
             title.setText(l.getTitle());
             adresse.setText(l.getAddress());
-            image.setImageDrawable(l.getImage());
+            Bitmap bitmap = DrawableManager.getInstance().getDrawable(l.getImage());
+            Drawable imageDrawable = new BitmapDrawable(getResources(), bitmap);
+            image.setImageDrawable(imageDrawable);
             return view;
         }
     }
@@ -776,10 +686,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 unLandmark.getString("url"),
                 (float) unLandmark.getDouble("price"),
                 (float) unLandmark.getDouble("distanceKM"),
-                "",
+                unLandmark.getString("image"),
                 unLandmark.getString("tags"),
                 unLandmark.getInt("liked") != 0);
-        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+        DrawableManager.getInstance().loadImage(l.getImage(), getApplicationContext());
+
         return l;
     }
 }

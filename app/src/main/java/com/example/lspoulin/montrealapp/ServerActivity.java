@@ -381,7 +381,7 @@ public class ServerActivity extends AppCompatActivity {
                                                 "",
                                                 unLandmark.getString("tags"),
                                                 unLandmark.getBoolean("liked"));
-                                        l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                        //l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                         landmarks.add(l);
                                     }
                                     Intent result = new Intent();
@@ -449,7 +449,7 @@ public class ServerActivity extends AppCompatActivity {
                                             "",
                                             unLandmark.getString("tags"),
                                             unLandmark.getInt("liked")!=0);
-                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                    //l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                     landmarks.add(l);
                                 }
                                 Intent result = new Intent();
@@ -549,7 +549,7 @@ public class ServerActivity extends AppCompatActivity {
                                             unLandmark.getString("tags"),
                                             unLandmark.getBoolean("liked")
                                     );
-                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                    //l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                     landmarks.add(l);
                                 }
                                 Intent result = new Intent();
@@ -621,7 +621,7 @@ public class ServerActivity extends AppCompatActivity {
                                             "",
                                             unLandmark.getString("tags"),
                                             unLandmark.getInt("liked")!=0);
-                                    l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
+                                    //l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
                                     landmarks.add(l);
                                 }
                                 Intent result = new Intent();

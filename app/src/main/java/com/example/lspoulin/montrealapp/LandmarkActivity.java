@@ -1,6 +1,9 @@
 package com.example.lspoulin.montrealapp;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -46,8 +49,14 @@ public class LandmarkActivity extends AppCompatActivity {
         title.setText(landmark.getTitle());
         address.setText(landmark.getAddress());
         description.setText(landmark.getDescription());
-        imageView.setImageDrawable(landmark.getImage());
+        DrawableManager.getInstance().setListener(imageView);
+        Bitmap bitmap = DrawableManager.getInstance().getDrawable(landmark.getImage());
+        Drawable imageDrawable = new BitmapDrawable(getResources(), bitmap);
+        imageView.setImageDrawable(imageDrawable);
 
+
+
+        //imageView.setImageURI(Uri.parse(ServerManager.getPhotoURL(landmark.getImage())));
         if(!UserManager.getInstance().isLoggin()){
             liked.setVisibility(View.GONE);
         }

@@ -20,6 +20,7 @@
 	 }catch (Exception $e){
 		 $tab[0]="NOK";
 	 }finally {
+	 	header('Content-Type: application/json');
 		echo json_encode($tab);
 	 }
  }
@@ -44,6 +45,7 @@
 	 }catch (Exception $e){
 		 $tab[0]="NOK";
 	 }finally {
+	 	header('Content-Type: application/json');
 		echo json_encode($tab);
 	 }
  }
@@ -72,6 +74,7 @@
 	 }catch (Exception $e){
 		 $tab[0]="NOK";
 	 }finally {
+	 	header('Content-Type: application/json');
 		echo json_encode($tab);
 	 }
  }
@@ -128,6 +131,7 @@
 	 }catch (Exception $e){
 		 $tab[0]="NOK";
 	 }finally {
+	 	header('Content-Type: application/json');
 		echo json_encode($tab);
 	 }
  }
@@ -143,6 +147,7 @@
 	 }catch (Exception $e){
 		 $tab[0]="NOK";
 	 }finally {
+	 	header('Content-Type: application/json');
 		echo json_encode($tab);
 	 }
  }
@@ -159,6 +164,7 @@
 	 }catch (Exception $e){
 		 $tab[0]="NOK";
 	 }finally {
+	 	header('Content-Type: application/json');
 		echo json_encode($tab);
 	 }
  }
@@ -176,6 +182,7 @@
 	 }catch (Exception $e){
 		 $tab[0]="NOK";
 	 }finally {
+	 	header('Content-Type: application/json');
 		echo json_encode($tab);
 	 }
  }
