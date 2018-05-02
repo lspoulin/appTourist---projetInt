@@ -82,7 +82,8 @@ public class DrawableManager {
             return stored ;
 
         try {
-            //file.createNewFile();
+            Log.d("Saving image :", filename);
+            file.createNewFile();
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.flush();
@@ -91,6 +92,7 @@ public class DrawableManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Log.d("Image is stored :", filename);
         return stored;
     }
 
@@ -106,6 +108,7 @@ public class DrawableManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Log.d("Image loaded :", imagename);
         return mediaImage;
     }
     public boolean checkifImageExists(String imagename)
@@ -124,12 +127,6 @@ public class DrawableManager {
         return true ;
     }
 
-    public Drawable getDrawableBitmapFromJSON(String encodedImage, Context context) {
-        byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        Drawable d = new BitmapDrawable(context.getResources(),decodedByte);
-        return d;
-    }
 
     public static boolean canWriteOnExternalStorage() {
         // get the state of your external storage
@@ -145,18 +142,21 @@ public class DrawableManager {
 
         if(!drawablelist.containsKey(image)) {
             if (checkifImageExists(image)) {
+                Log.d("Image exist on disk :", image);
                 File f = getImage(image);
                 Bitmap bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
                 addDrawable(image, bitmap);
+                Log.d("Image added :", image);
             } else {
                 ImageRequest request = new ImageRequest(ServerManager.getPhotoURL(image),
                         new Response.Listener<Bitmap>() {
                             @Override
                             public void onResponse(Bitmap bitmap) {
+                                Log.d("Image downloaded :", image);
                                 addDrawable(image, bitmap);
                                 if(canWriteOnExternalStorage()) {
-                                    if (saveToDisk(bitmap, image) != null)
-                                        Log.d("Image is stored :", image);
+                                    saveToDisk(bitmap, image);
+
                                 }
 
                             }
