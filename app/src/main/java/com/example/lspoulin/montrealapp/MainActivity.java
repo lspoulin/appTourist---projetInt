@@ -435,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        /*if(requestCode == CODE_LIST_LANDMARK && resultCode == ServerActivity.RESULT_OK){
+        if(requestCode == CODE_LIST_LANDMARK && resultCode == ServerActivity.RESULT_OK){
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
 
             landmarkList = listerLandmark;
@@ -469,7 +469,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
             landmarkList = listerLandmark;
             customAdapter.notifyDataSetChanged();
-        }*/
+        }
 
     }
 
@@ -513,7 +513,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             loadLandmarks(tag);
         }
 
-        loadLandmarks(tag);
+
 
         mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
@@ -547,8 +547,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }else if(view.getId() == R.id.btnUser){
             if (UserManager.getInstance().isLoggin()){
-                Intent i;
-                i  = new Intent(MainActivity.this, UserActivity.class);
+
             }
             else{
                 showUserLogin();
@@ -559,15 +558,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Intent i;
                 i  = new Intent(MainActivity.this, PreferenceActivity.class);
 
-/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
-/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
-
                 i.putExtra("Preference", UserManager.getInstance().getUser().getPreferences());
-
-
-/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
-/*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ SI ISLOGGIN JE VEUT ENVOYER A L'ACTIVITY PREFERENCE UN STRING DES PREFERENCE DE L'UTILISATEUR \\\\\\\\\\\\\\*/
-
 
                 startActivity(i);
             }
@@ -576,20 +567,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
 
 
-        /*
-
-            Intent i;
-            i  = new Intent(MainActivity.this, PreferenceActivity.class);
-            //i.putExtra("Preference", User.getPreferences().toString());
-
-            startActivity(i);
-
-        */
 
         }else if(view.getId() == R.id.btnSrch){
             Toast.makeText(this, "Button Srch CLicked", Toast.LENGTH_LONG). show();
             Intent i;
             i  = new Intent(MainActivity.this, SearchActivity.class);
+
+            startActivity(i);
 
         }
     }
