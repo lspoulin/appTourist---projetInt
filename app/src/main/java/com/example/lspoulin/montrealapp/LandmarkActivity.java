@@ -48,7 +48,9 @@ public class LandmarkActivity extends AppCompatActivity {
         ImageView imageView = (ImageView)findViewById(R.id.imgLandmark);
         Button webbutton = (Button)findViewById(R.id.btnWeb);
         final ImageButton liked = (ImageButton)findViewById(R.id.imgLiked);
-        
+
+
+
 
         btnBack = (ImageButton)findViewById(R.id.btnLandMarkBack) ;
 

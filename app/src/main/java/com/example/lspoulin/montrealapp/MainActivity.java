@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private Spinner spinSortBy;
     private List<Landmark> landmarkList;
+    private List<Landmark> landmarkListToSend;
     private ListView mainListView;
     private CustomAdapter customAdapter;
     private ImageButton btnUtilisateur, btnPreference, btnFavoris, btnRecherche;
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         btnPreference.setOnClickListener(this);
 
         landmarkList = new ArrayList<Landmark>();
-
+        landmarkListToSend = new ArrayList<Landmark>();
         ArrayAdapter<CharSequence> spinAdapter = ArrayAdapter.createFromResource(this, R.array.sort_activity, android.R.layout.simple_spinner_item);
         spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinSortBy.setAdapter(spinAdapter);
@@ -400,18 +401,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onClick(View view) {
         if(view.getId() == R.id.btnFav){
-            try {
-                ArrayList<Landmark> landmarkLiked = new ArrayList<Landmark>();
-                for (Landmark l : landmarkList) {
-                    if(l.isLiked())
-                    landmarkLiked.add(l);
-                }
-                landmarkList = landmarkLiked;
-                customAdapter.notifyDataSetChanged();
-            }
-            catch (Exception e){
 
+
+
+            if (UserManager.getInstance().isLoggin()){
+
+                    ArrayList<Landmark> landmarkLiked = new ArrayList<Landmark>();
+                    for (Landmark l : landmarkList) {
+                        if(l.isLiked())
+                            landmarkLiked.add(l);
+                    }
+                    landmarkListToSend = landmarkLiked;
+
+                    Toast.makeText(this, "Show user settings", Toast.LENGTH_LONG). show();
+                    Intent intente;
+                    intente  = new Intent(MainActivity.this, FavoriteActivity.class);
+
+                    intente.putParcelableArrayListExtra("Liste", (ArrayList<? extends Parcelable>) landmarkListToSend);
+                    startActivity(intente);
+                    //customAdapter.notifyDataSetChanged();
+                }
+
+
+            else{
+                showUserLogin();
             }
+
+
 
         }else if(view.getId() == R.id.btnUser){
             if (UserManager.getInstance().isLoggin()){
