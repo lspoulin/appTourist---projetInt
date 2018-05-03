@@ -83,6 +83,7 @@ public class DrawableManager {
 
         try {
             Log.d("Saving image :", filename);
+            Environment.getExternalStorageDirectory().toString();
             file.createNewFile();
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);

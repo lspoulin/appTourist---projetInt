@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ProgressBar progress;
     private Switch swtPref;
     private Map<String, String> tagsMap = new HashMap<String, String>();
+    private boolean comingFromSplash;
 
 
 
@@ -70,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         spinSortBy = (Spinner) findViewById(R.id.spnSort);
         btnFavoris = (ImageButton)findViewById(R.id.btnFav);
@@ -92,13 +92,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         tagsMap.put("Récréative", "recreative");
 
 
-
         btnFavoris.setOnClickListener(this);
         btnUtilisateur.setOnClickListener(this);
         btnRecherche.setOnClickListener(this);
         btnPreference.setOnClickListener(this);
 
-        landmarkList = new ArrayList<Landmark>();
+        landmarkList = getIntent().getParcelableArrayListExtra(SplashActivity.LANDMARK_LIST);
+        if(landmarkList == null) landmarkList = new ArrayList<Landmark>();
+        comingFromSplash = true;
         landmarkListToSend = new ArrayList<Landmark>();
         ArrayAdapter<CharSequence> spinAdapter = ArrayAdapter.createFromResource(this, R.array.sort_activity, android.R.layout.simple_spinner_item);
         spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -391,6 +392,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         String tag = tagsMap.get(spinSortBy.getSelectedItem());
         if(tag == null) tag ="";
+        if(!comingFromSplash)
         if(swtPref.isChecked()){
             if(UserManager.getInstance().isLoggin()){
                 affPreference(tag);
@@ -398,6 +400,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }else{
             loadLandmarks(tag);
         }
+        else
+            comingFromSplash = false;
 
       
 
@@ -551,14 +555,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         String tag = tagsMap.get(spinSortBy.getSelectedItem());
         if(tag == null) tag = "";
-        if(swtPref.isChecked()){
-            if(UserManager.getInstance().isLoggin()){
-                affPreference(tag);
-            }
-        }else{
+        if(!comingFromSplash)
+            if(swtPref.isChecked()){
+                if(UserManager.getInstance().isLoggin()){
+                    affPreference(tag);
+                }
+            }else{
 
-            loadLandmarks(tag);
-        }
+                loadLandmarks(tag);
+            }
+        else
+            comingFromSplash = false;
 
     }
 
