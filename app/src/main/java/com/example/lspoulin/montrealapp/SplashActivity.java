@@ -15,11 +15,12 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+
         Handler handler = new Handler();
         handler.postDelayed(new Runnable(){
             @Override
             public void run(){
+                startActivity(intent);
                 finish();
             }
         }, 3000);
