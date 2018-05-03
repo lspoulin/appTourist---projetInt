@@ -28,8 +28,12 @@ import java.util.Map;
 
 public class LandmarkActivity extends AppCompatActivity {
     public static final String LANDMARK = "com.example.lspoulimn.montrealapp.landmarkActivity.landmark";
+    public static final String LANDMARK_ID = "com.example.lspoulimn.montrealapp.landmarkActivity.landmarkid";
+    public static final String LIKED = "com.example.lspoulimn.montrealapp.landmarkActivity.liked";
+
 
     private ImageButton btnBack;
+    private  Landmark landmark;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +43,7 @@ public class LandmarkActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        final Landmark landmark = intent.getExtras().getParcelable(LANDMARK);
+        landmark = intent.getExtras().getParcelable(LANDMARK);
 
 
         TextView title = (TextView)findViewById(R.id.title);
@@ -57,6 +61,7 @@ public class LandmarkActivity extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 finish();
             }
         });
@@ -81,7 +86,6 @@ public class LandmarkActivity extends AppCompatActivity {
             else
                 liked.setImageResource(R.drawable.heartoutline);
         }
-
 
 
 
@@ -116,6 +120,17 @@ public class LandmarkActivity extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    public void finish(){
+
+        Intent intent = new Intent();
+        setResult(RESULT_OK, intent);
+        intent.putExtra(LandmarkActivity.LANDMARK_ID, landmark.getId());
+        intent.putExtra(LandmarkActivity.LIKED,landmark.isLiked());
+
+        super.finish();
     }
 
     private void landmarkUnliked(final int userid, final int landmarkid) {
@@ -173,7 +188,7 @@ public class LandmarkActivity extends AppCompatActivity {
                             JSONArray jsonResponse = new JSONArray(response);
                             String msg = jsonResponse.getString(0);
                             if(msg.equals("OK")){
-                                Intent result = new Intent();
+                                //Intent result = new Intent();
                                 //resultOk(result);
                             }
                             else{
@@ -205,4 +220,5 @@ public class LandmarkActivity extends AppCompatActivity {
         };
         Volley.newRequestQueue(this).add(requete);
     }
+
 }

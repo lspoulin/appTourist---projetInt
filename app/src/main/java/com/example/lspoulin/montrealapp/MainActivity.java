@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+    public static final int CODE_LANDMARK = 10001;
 
 
     private Spinner spinSortBy;
@@ -110,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Intent i;
         i  = new Intent(MainActivity.this, LandmarkActivity.class);
         i.putExtra(LandmarkActivity.LANDMARK, (Parcelable) landmark);
-        startActivity(i);
+        startActivityForResult(i, CODE_LANDMARK);
     }
 
     private void loginAttempt(final String username, final String password) {
@@ -336,6 +337,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
+
+        if(requestCode == CODE_LANDMARK && resultCode == ServerActivity.RESULT_OK){
+            ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
+
+            int id = intent.getIntExtra(LandmarkActivity.LANDMARK_ID, -1);
+            if (id == -1)return;
+            boolean liked = intent.getBooleanExtra(LandmarkActivity.LIKED, false);
+
+            for(Landmark l : landmarkList){
+                if (l.getId()==id) {
+                    l.setLiked(liked);
+                    break;
+                }
+            }
+
+            customAdapter.notifyDataSetChanged();
+        }
 
     }
 
