@@ -34,11 +34,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SearchActivity"></activity>
-        <activity android:name=".ResultActivity"></activity>
-        <activity android:name=".LandmarkActivity"></activity>
-        <activity android:name=".FavoriteActivity"></activity>
-        <activity android:name=".PreferenceActivity"></activity>
+        <activity android:name=".SearchActivity" android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity android:name=".ResultActivity" android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".LandmarkActivity" android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".FavoriteActivity" android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".PreferenceActivity" android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
