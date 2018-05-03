@@ -90,9 +90,6 @@ public class ResultActivity extends AppCompatActivity {
                 loadLandmarkById(landmarkList.get(position).getId());
             }
         });
-
-
-
     }
 
 
@@ -101,7 +98,7 @@ public class ResultActivity extends AppCompatActivity {
 
         progress.setVisibility(View.VISIBLE);
 
-        final String tags = key;
+        final String tags = key.toLowerCase();
         StringRequest requete = new StringRequest(Request.Method.POST, getControllerLandmark(),
                 new Response.Listener<String>() {
                     @Override
@@ -116,38 +113,22 @@ public class ResultActivity extends AppCompatActivity {
                                 ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
                                 for(i=1;i<jsonResponse.length();i++){
                                     unLandmark=jsonResponse.getJSONObject(i);
-                                    Landmark l = new Landmark(unLandmark.getInt("id"),
-                                            unLandmark.getString("title"),
-                                            unLandmark.getString("description"),
-                                            unLandmark.getString("address"),
-                                            (float)unLandmark.getDouble("latitude"),
-                                            (float) unLandmark.getDouble("longitude"),
-                                            unLandmark.getString("url"),
-                                            (float)unLandmark.getDouble("price"),
-                                            (float)unLandmark.getDouble("distanceKM"),
-                                            "",
-                                            unLandmark.getString("tags"),
-                                            unLandmark.getBoolean("liked")
-                                    );
-                                    //l.setImage(getDrawableBitmapFromJSON(unLandmark.getString("image")));
 
-                                    if((unLandmark.getString("tags").contains(tags)) || (unLandmark.getString("title").contains(tags)) || (unLandmark.getString("description").contains(tags))) {
-
+                                    if((unLandmark.getString("tags").toLowerCase().contains(tags)) || (unLandmark.getString("title").toLowerCase().contains(tags)) || (unLandmark.getString("description").toLowerCase().contains(tags))) {
+                                        Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
                                         landmarks.add(l);
-
-                                    }else{
-
                                     }
                                 }
-
-
                                 landmarkList = landmarks;
                                 customAdapter.notifyDataSetChanged();
+                                progress.setVisibility(View.GONE);
                                 Intent result = new Intent();
                                 result.putParcelableArrayListExtra(ServerActivity.LANDMARK_LIST, landmarks);
                                 resultOk(result);
+
                             }
                             else{
+                                progress.setVisibility(View.GONE);
                                 resultNotOk();
                             }
                         } catch (JSONException e) {
@@ -172,6 +153,9 @@ public class ResultActivity extends AppCompatActivity {
                 params.put("action", "listerParDistance");
                 params.put("latitude", latitude+"");
                 params.put("longitude", longitude+"");
+                if(UserManager.getInstance().isLoggin() && UserManager.getInstance().getUser() != null) {
+                    params.put("userid", UserManager.getInstance().getUser().getId() + "");
+                }
                 return params;
             }
         };
@@ -198,7 +182,7 @@ public class ResultActivity extends AppCompatActivity {
     private void loadLandmarks(String tag) {
        progress.setVisibility(View.VISIBLE);
 
-        final String tags = tag;
+        final String tags = tag.toLowerCase();
         StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
                 new Response.Listener<String>() {
                     @Override
@@ -214,12 +198,9 @@ public class ResultActivity extends AppCompatActivity {
                                 for(i=1;i<jsonResponse.length();i++){
                                     unLandmark=jsonResponse.getJSONObject(i);
 
-                                    if((unLandmark.getString("tags").contains(tags)) || (unLandmark.getString("title").contains(tags)) || (unLandmark.getString("description").contains(tags))) {
+                                    if((unLandmark.getString("tags").toLowerCase().contains(tags)) || (unLandmark.getString("title").toLowerCase().contains(tags)) || (unLandmark.getString("description").toLowerCase().contains(tags))) {
                                         Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
                                         landmarks.add(l);
-
-                                    }else{
-
                                     }
                                 }
 
