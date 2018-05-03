@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Spinner spinSortBy;
     private List<Landmark> landmarkList;
     private List<Landmark> landmarkListToSend;
+    private String[] tabPref ;
     private ListView mainListView;
     private CustomAdapter customAdapter;
     private ImageButton btnUtilisateur, btnPreference, btnFavoris, btnRecherche;
@@ -82,7 +83,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         progress.setVisibility(View.GONE);
         swtPref= (Switch) findViewById(R.id.switchPref);
 
-        tagsMap.put("Populaire", "plus_populaire");
+        tabPref = new String[7];
+
+        tabPref[0] = "gastronomique";
+        tabPref[1] = "plus_populaire";
+        tabPref[2] = "plein_air";
+        tabPref[3] = "sport";
+        tabPref[4] = "familier";
+        tabPref[5] = "culturelle";
+        tabPref[6] = "recreative";
+
+
+        tagsMap.put("Général", "");
         tagsMap.put("Restaurant", "gastronomique");
         tagsMap.put("Populaire", "plus_populaire");
         tagsMap.put("Plein Air", "plein_air");
@@ -435,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     landmarkListToSend = landmarkLiked;
 
-                    Toast.makeText(this, "Show user settings", Toast.LENGTH_LONG). show();
+
                     Intent intente;
                     intente  = new Intent(MainActivity.this, FavoriteActivity.class);
 
@@ -606,13 +618,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void affPreference(final String tags){
         progress.setVisibility(View.VISIBLE);
+
+        final String tag = tags;
         StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
                             Log.d("RESULTAT", response);
-                            UserManager user = UserManager.getInstance();
                             int i;
                             JSONArray jsonResponse = new JSONArray(response);
                             String msg = jsonResponse.getString(0);
@@ -620,9 +633,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 JSONObject unLandmark;
                                 ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
                                 for(i=1;i<jsonResponse.length();i++){
-                                    Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
-                                    landmarks.add(l);
-                                }
+                                    unLandmark=jsonResponse.getJSONObject(i);
+                                    Boolean stop = false;
+
+                                    for(int k = 0 ; k < tabPref.length ; k++) {
+
+                                        if (stop == false) {
+
+                                            if (UserManager.getInstance().getUser().getPreferences().contains(tabPref[k])) {
+                                                if (unLandmark.getString("tags").contains(tabPref[k])) {
+                                                    Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
+                                                    landmarks.add(l);
+                                                    stop = true;
+
+
+                                                }
+
+
+                                            } else if (unLandmark.getString("tags").contains(tags)) {
+                                                Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
+                                                landmarks.add(l);
+                                                stop = true;
+                                            }
+                                        }
+                                    }
+
+                                    }
 
                                 landmarkList = landmarks;
                                 customAdapter.notifyDataSetChanged();
@@ -651,15 +687,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 // Les parametres pour POST
-                params.put("action", "listerAvecTags");
-                params.put("tags", tags);
+                params.put("action", "lister");
                 if(UserManager.getInstance().isLoggin())
                     params.put("userid", UserManager.getInstance().getUser().getId()+"");
                 return params;
             }
         };
+        Log.d("requete url" ,requete.getUrl());
         Volley.newRequestQueue(this).add(requete);
     }
+
+
+
+
+
+
+
+
+
 
     private Landmark getLandmarkFromResponse(JSONObject unLandmark) throws JSONException{
         Landmark l = new Landmark(unLandmark.getInt("id"),
