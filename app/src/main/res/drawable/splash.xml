@@ -7,8 +7,13 @@
             android:gravity="center"
             android:scaleType="centerCrop"/>
     </item>
-    <item>
+    <item >
         <bitmap android:src="@drawable/titre_montreal_yellow"
-            android:gravity="center" />
+            android:gravity="center"
+            android:top="5dp"
+            android:left="0dp"
+            android:bottom="0dp"
+            android:right="50dp"/>
     </item>
+
 </layer-list>
