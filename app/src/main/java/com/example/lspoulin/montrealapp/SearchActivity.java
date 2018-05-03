@@ -33,6 +33,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         ArrayAdapter<CharSequence> spinAdapter = ArrayAdapter.createFromResource(this, R.array.sort_search, android.R.layout.simple_spinner_item);
         spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinSortBy.setAdapter(spinAdapter);
+        
 
         btnRecherche.setOnClickListener(this);
         btnBack.setOnClickListener(this);
