@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
  */
 
 public class ServerManager {
-    public static final boolean LOCAL_SERVER = false;
+    public static final boolean LOCAL_SERVER = true;
     public static final String CONTROLLEUR_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/PHP/";
     public static final String PHOTO_ENTRY_POINT = "https://apptouristprojetint.000webhostapp.com/photos/";
     public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "activityControleurJSON.php";

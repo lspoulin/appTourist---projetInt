@@ -4,6 +4,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 /**
@@ -11,7 +14,7 @@ import java.io.Serializable;
  */
 //Java Bean Landmark
 
-public class Landmark implements Serializable, Parcelable {
+public class Landmark implements Serializable, Parcelable, Mappable {
     public static final String TABLE_NAME = "landmarks";
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_TITLE = "title";
@@ -50,6 +53,27 @@ public class Landmark implements Serializable, Parcelable {
     private boolean liked;
     private float price;
     private String image;
+    private float distanceKM;
+
+    public Landmark(){
+
+    }
+
+    public Landmark(int id, String title, String description, String address, float latitude, float longitude,
+                    String url, float price, float distanceKM, String image, String tags, boolean liked){
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.url = url;
+        this.price = price;
+        this.distanceKM = distanceKM;
+        this.image = image;
+        this.tags = tags;
+        this.liked = liked;
+    }
 
     public double calculateDistanceKM(int latitude, int longitude){
         return 111.111 *
@@ -76,13 +100,7 @@ public class Landmark implements Serializable, Parcelable {
         this.liked = liked;
     }
 
-
-
-
-    public void setImage(String image) {
-        this.image = image;
-
-    }
+    public void setImage(String image) { this.image = image; }
 
     public String getImage() {
         return this.image;
@@ -95,8 +113,6 @@ public class Landmark implements Serializable, Parcelable {
     public void setDistanceKM(float distanceKM) {
         this.distanceKM = distanceKM;
     }
-
-    private float distanceKM;
 
     public int getId() {
         return id;
@@ -162,26 +178,6 @@ public class Landmark implements Serializable, Parcelable {
         this.price = price;
     }
 
-    public Landmark(){
-
-    }
-
-    public Landmark(int id, String title, String description, String address, float latitude, float longitude,
-                    String url, float price, float distanceKM, String image, String tags, boolean liked){
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.address = address;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.url = url;
-        this.price = price;
-        this.distanceKM = distanceKM;
-        this.image = image;
-        this.tags = tags;
-        this.liked = liked;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -227,4 +223,29 @@ public class Landmark implements Serializable, Parcelable {
             return new Landmark[i];
         }
     };
+
+    @Override
+    public void mapJSON(JSONObject object) {
+        try {
+            this.id = object.getInt("id");
+            this.title = object.getString("title");
+            this.description = object.getString("description");
+            this.address = object.getString("address");
+            this.latitude = (float) object.getDouble("latitude");
+            this.longitude = (float) object.getDouble("longitude");
+            this.url = object.getString("url");
+            this.price = (float) object.getDouble("price");
+            this.distanceKM = (float) object.getDouble("distanceKM");
+            this.image = object.getString("image");
+            this.tags = object.getString("tags");
+            this.liked = (object.getInt("liked") != 0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String toJSON() {
+        return null;
+    }
 }
