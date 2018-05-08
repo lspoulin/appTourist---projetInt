@@ -1,6 +1,5 @@
 package com.example.lspoulin.montrealapp;
 
-import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -12,7 +11,7 @@ import java.io.Serializable;
 /**
  * Created by lspoulin on 2018-04-20.
  */
-//Java Bean Landmark
+
 
 public class Landmark implements Serializable, Parcelable, Mappable {
     public static final String TABLE_NAME = "landmarks";

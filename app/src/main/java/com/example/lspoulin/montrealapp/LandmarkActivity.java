@@ -7,24 +7,11 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LandmarkActivity extends AppCompatActivity {
     public static final String LANDMARK = "com.example.lspoulimn.montrealapp.landmarkActivity.landmark";
@@ -43,11 +30,8 @@ public class LandmarkActivity extends AppCompatActivity {
         setContentView(R.layout.activity_landmark);
 
         apiHelper = new ApiHelper();
-
         Intent intent = getIntent();
-
         landmark = intent.getExtras().getParcelable(LANDMARK);
-
 
         TextView title = (TextView)findViewById(R.id.title);
         TextView description = (TextView)findViewById(R.id.description);
@@ -55,13 +39,7 @@ public class LandmarkActivity extends AppCompatActivity {
         ImageView imageView = (ImageView)findViewById(R.id.imgLandmark);
         Button webbutton = (Button)findViewById(R.id.btnWeb);
         final ImageButton liked = (ImageButton)findViewById(R.id.imgLiked);
-
-
-
-
         btnBack = (ImageButton)findViewById(R.id.btnLandMarkBack) ;
-
-
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,9 +57,6 @@ public class LandmarkActivity extends AppCompatActivity {
         Drawable imageDrawable = new BitmapDrawable(getResources(), bitmap);
         imageView.setImageDrawable(imageDrawable);
 
-
-
-        //imageView.setImageURI(Uri.parse(ServerManager.getPhotoURL(landmark.getImage())));
         if(!UserManager.getInstance().isLoggin()){
             liked.setVisibility(View.GONE);
         }

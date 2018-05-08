@@ -25,21 +25,6 @@ import java.util.Map;
 
 
 public class ApiManager<T extends Mappable> {
-
-    private final Constructor<? extends T> ctor;
-
-    private T field;
-
-    ApiManager(Class<? extends T> impl) throws NoSuchMethodException {
-        this.ctor = impl.getConstructor();
-    }
-
-    /*public void myMethod() throws Exception {
-        field = ctor.newInstance();
-    }*/
-
-
-
     public static final boolean LOCAL_SERVER = true;
     public static final String BASE_URL = "https://apptouristprojetint.000webhostapp.com/PHP/";
     public static final String BASE_URL_PHOTO = "https://apptouristprojetint.000webhostapp.com/photos/";
@@ -47,6 +32,15 @@ public class ApiManager<T extends Mappable> {
     public static final String CONTROLLEUR_USER_ENDPOINT = "userControleurJSON.php";
     public static final String LOCAL_BASE_URL = "http://10.0.2.2:8888/ProjetFinal/PHP/";
     public static final String LOCAL_BASE_URL_PHOTO = "http://10.0.2.2:8888/ProjetFinal/photos/";
+
+    // This is a convoluted way to create instances of the template type
+    private final Constructor<? extends T> ctor;
+
+    private T field;
+
+    ApiManager(Class<? extends T> impl) throws NoSuchMethodException {
+        this.ctor = impl.getConstructor();
+    }
 
 
     public static String getControllerLandmark() {

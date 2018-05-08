@@ -1,21 +1,13 @@
 package com.example.lspoulin.montrealapp;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,19 +25,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,8 +46,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Map<String, String> tagsMap = new HashMap<String, String>();
     private boolean comingFromSplash;
     private final ApiHelper apiHelper = new ApiHelper();
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -280,10 +258,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     Intent intent;
                     intent  = new Intent(MainActivity.this, FavoriteActivity.class);
-
                     intent.putParcelableArrayListExtra("Liste", (ArrayList<? extends Parcelable>) landmarkListToSend);
                     startActivity(intent);
-                    //customAdapter.notifyDataSetChanged();
                 }
             else{
                 showUserLogin();

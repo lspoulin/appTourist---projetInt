@@ -28,5 +28,4 @@ public class UserManager {
         return user;
     }
 
-
 }
