@@ -46,9 +46,6 @@ public class FavoriteActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite);
 
-
-
-
         landmarkList = new ArrayList<Landmark>();
 
         Bundle bundle= getIntent().getExtras();
@@ -96,54 +93,26 @@ public class FavoriteActivity  extends AppCompatActivity {
     }
 
 
-    private void loadLandmarkById(final int id){
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            int i;
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                JSONObject unLandmark;
-                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
-                                for(i=1;i<jsonResponse.length();i++){
-                                    Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
-                                    landmarks.add(l);
-                                }
-                                showLandmark(landmarks.get(0));
-                            }
-                            else{
-                                //resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            //resultNotOk();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //resultNotOk();
-                    }
+    private void loadLandmarkById(int id){
+        ApiManager<Landmark> apiLandmark;
+        try {
+            apiLandmark = new ApiManager<Landmark>(Landmark.class);
+            Map<String, String> parameters = new HashMap<String,String>();
+            parameters.put("action", "listerParId");
+            parameters.put("id", id+"");
+            if(UserManager.getInstance().isLoggin())
+                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
+            apiLandmark.postReturnMappable(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
+                @Override
+                public void methodToCallBack(Object object) {
+                    Landmark landmark = (Landmark) object;
+                    DrawableManager.getInstance().loadImage(landmark.getImage(), FavoriteActivity.this);
+                    showLandmark(landmark);
                 }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les parametres pour POST
-                params.put("action", "listerParId");
-                params.put("id", id+"");
-                if(UserManager.getInstance().isLoggin())
-                    params.put("userid", UserManager.getInstance().getUser().getId()+"");
-                return params;
-            }
-        };
-        Volley.newRequestQueue(this).add(requete);
-
+            });
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     class CustomAdapter extends BaseAdapter {
@@ -180,24 +149,5 @@ public class FavoriteActivity  extends AppCompatActivity {
             return view;
         }
     }
-
-    private Landmark getLandmarkFromResponse(JSONObject unLandmark) throws JSONException{
-        Landmark l = new Landmark(unLandmark.getInt("id"),
-                unLandmark.getString("title"),
-                unLandmark.getString("description"),
-                unLandmark.getString("address"),
-                (float) unLandmark.getDouble("latitude"),
-                (float) unLandmark.getDouble("longitude"),
-                unLandmark.getString("url"),
-                (float) unLandmark.getDouble("price"),
-                (float) unLandmark.getDouble("distanceKM"),
-                unLandmark.getString("image"),
-                unLandmark.getString("tags"),
-                unLandmark.getInt("liked") != 0);
-        DrawableManager.getInstance().loadImage(l.getImage(), getApplicationContext());
-
-        return l;
-    }
-
 
 }

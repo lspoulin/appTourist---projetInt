@@ -53,9 +53,7 @@ public class ResultActivity extends AppCompatActivity {
         String sort = i.getStringExtra("Preference");
 
         landmarkList = new ArrayList<Landmark>();
-
-
-
+        
         progress = (ProgressBar) findViewById(R.id.progressBar);
         progress.setVisibility(View.GONE);
         mainListView = (ListView) findViewById(R.id.listAffResult);
@@ -74,15 +72,10 @@ public class ResultActivity extends AppCompatActivity {
 
 
         if(sort.equals("Distance")){
-
             listerLandmarkByDistance(45.5519, -73.6431, key);
-
         }else{
-
-
             loadLandmarks(key);
         }
-
 
         mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
@@ -97,69 +90,46 @@ public class ResultActivity extends AppCompatActivity {
     private void listerLandmarkByDistance(final double latitude, final double longitude, String key) {
 
         progress.setVisibility(View.VISIBLE);
-
         final String tags = key.toLowerCase();
-        StringRequest requete = new StringRequest(Request.Method.POST, getControllerLandmark(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            int i;
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                JSONObject unLandmark;
-                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
-                                for(i=1;i<jsonResponse.length();i++){
-                                    unLandmark=jsonResponse.getJSONObject(i);
+        Map<String, String> params = new HashMap<>();
+        // Les parametres pour POST
+        params.put("action", "listerParDistance");
+        params.put("latitude", latitude+"");
+        params.put("longitude", longitude+"");
+        if(UserManager.getInstance().isLoggin() && UserManager.getInstance().getUser() != null) {
+            params.put("userid", UserManager.getInstance().getUser().getId() + "");
+        }
 
-                                    if((unLandmark.getString("tags").toLowerCase().contains(tags)) || (unLandmark.getString("title").toLowerCase().contains(tags)) || (unLandmark.getString("description").toLowerCase().contains(tags))) {
-                                        Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
-                                        landmarks.add(l);
-                                    }
-                                }
-                                landmarkList = landmarks;
-                                customAdapter.notifyDataSetChanged();
-                                progress.setVisibility(View.GONE);
-                                Intent result = new Intent();
-                                result.putParcelableArrayListExtra(ServerActivity.LANDMARK_LIST, landmarks);
-                                resultOk(result);
+        ApiManager<Landmark> apiLandmark;
+        try {
+            apiLandmark = new ApiManager<Landmark>(Landmark.class);
+            Map<String, String> parameters = new HashMap<String,String>();
+            parameters.put("action", "lister");
+            if(UserManager.getInstance().isLoggin())
+                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
+            apiLandmark.postReturnMappableArray(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
+                @Override
+                public void methodToCallBack(Object object) {
+                    ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
+                    ArrayList<Landmark> filtered = new ArrayList<Landmark>();
+                    for(Landmark landmark: temps) {
+                        if((landmark.getTags().toLowerCase().contains(tags)) || (landmark.getTitle().toLowerCase().contains(tags)) || (landmark.getDescription().toLowerCase().contains(tags))) {
 
-                            }
-                            else{
-                                progress.setVisibility(View.GONE);
-                                resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            resultNotOk();
-                            progress.setVisibility(View.GONE);
+                            filtered.add(landmark);
+                            DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
                         }
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        resultNotOk();
-                        progress.setVisibility(View.GONE);
-                    }
+                    landmarkList = filtered;
+                    customAdapter.notifyDataSetChanged();
+                    progress.setVisibility(View.GONE);
+                    Intent result = new Intent();
+                    result.putParcelableArrayListExtra(ServerActivity.LANDMARK_LIST, filtered);
+                    resultOk(result);
                 }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les parametres pour POST
-                params.put("action", "listerParDistance");
-                params.put("latitude", latitude+"");
-                params.put("longitude", longitude+"");
-                if(UserManager.getInstance().isLoggin() && UserManager.getInstance().getUser() != null) {
-                    params.put("userid", UserManager.getInstance().getUser().getId() + "");
-                }
-                return params;
-            }
-        };
-        Volley.newRequestQueue(this).add(requete);
+            });
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -179,68 +149,36 @@ public class ResultActivity extends AppCompatActivity {
     }
 
 
-    private void loadLandmarks(String tag) {
-       progress.setVisibility(View.VISIBLE);
+    private void loadLandmarks(final String tag) {
+        progress.setVisibility(View.VISIBLE);
 
-        final String tags = tag.toLowerCase();
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            int i;
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                JSONObject unLandmark;
-                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
-                                for(i=1;i<jsonResponse.length();i++){
-                                    unLandmark=jsonResponse.getJSONObject(i);
-
-                                    if((unLandmark.getString("tags").toLowerCase().contains(tags)) || (unLandmark.getString("title").toLowerCase().contains(tags)) || (unLandmark.getString("description").toLowerCase().contains(tags))) {
-                                        Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
-                                        landmarks.add(l);
-                                    }
-                                }
-
-                                landmarkList = landmarks;
-                                customAdapter.notifyDataSetChanged();
-                            }
-                            else{
-                                //resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            //resultNotOk();
-                        }
-                        finally {
-                            progress.setVisibility(View.GONE);
+        ApiManager<Landmark> apiLandmark;
+        try {
+            apiLandmark = new ApiManager<Landmark>(Landmark.class);
+            Map<String, String> parameters = new HashMap<String,String>();
+            parameters.put("action", "lister");
+            if(UserManager.getInstance().isLoggin())
+                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
+            apiLandmark.postReturnMappableArray(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
+                @Override
+                public void methodToCallBack(Object object) {
+                    ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
+                    ArrayList<Landmark> filtered = new ArrayList<Landmark>();
+                    for(Landmark landmark: temps) {
+                        if(landmark.getTags().contains(tag)) {
+                            filtered.add(landmark);
+                            DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
                         }
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //resultNotOk();
-                        progress.setVisibility(View.GONE);
-                    }
+                    landmarkList = filtered;
+                    customAdapter.notifyDataSetChanged();
+                    progress.setVisibility(View.GONE);
                 }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les parametres pour POST
-                params.put("action", "lister");
-                if(UserManager.getInstance().isLoggin())
-                    params.put("userid", UserManager.getInstance().getUser().getId()+"");
-                return params;
-            }
-        };
-        Log.d("requete url" ,requete.getUrl());
-        Volley.newRequestQueue(this).add(requete);
+            });
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
-
     private Landmark getLandmarkFromResponse(JSONObject unLandmark) throws JSONException{
         Landmark l = new Landmark(unLandmark.getInt("id"),
                 unLandmark.getString("title"),
@@ -304,54 +242,26 @@ public class ResultActivity extends AppCompatActivity {
     }
 
 
-    private void loadLandmarkById(final int id){
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            int i;
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                JSONObject unLandmark;
-                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
-                                for(i=1;i<jsonResponse.length();i++){
-                                    Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
-                                    landmarks.add(l);
-                                }
-                                showLandmark(landmarks.get(0));
-                            }
-                            else{
-                                //resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            //resultNotOk();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //resultNotOk();
-                    }
+    private void loadLandmarkById(int id){
+        ApiManager<Landmark> apiLandmark;
+        try {
+            apiLandmark = new ApiManager<Landmark>(Landmark.class);
+            Map<String, String> parameters = new HashMap<String,String>();
+            parameters.put("action", "listerParId");
+            parameters.put("id", id+"");
+            if(UserManager.getInstance().isLoggin())
+                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
+            apiLandmark.postReturnMappable(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
+                @Override
+                public void methodToCallBack(Object object) {
+                    Landmark landmark = (Landmark) object;
+                    DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
+                    showLandmark(landmark);
                 }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les parametres pour POST
-                params.put("action", "listerParId");
-                params.put("id", id+"");
-                if(UserManager.getInstance().isLoggin())
-                    params.put("userid", UserManager.getInstance().getUser().getId()+"");
-                return params;
-            }
-        };
-        Volley.newRequestQueue(this).add(requete);
-
+            });
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
 }
