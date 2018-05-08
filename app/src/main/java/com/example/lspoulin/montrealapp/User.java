@@ -3,15 +3,29 @@ package com.example.lspoulin.montrealapp;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 /**
  * Created by lspoulin on 2018-04-24.
  */
 
-public class User  implements Serializable, Parcelable {
+public class User  implements Serializable, Parcelable, Mappable {
     private int id;
     private String name;
+    private String email;
+    private static String preferences;
+
+    public User(){}
+
+    public User(int id, String name, String email, String preferences){
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.preferences = preferences;
+    }
 
     public int getId() {
         return id;
@@ -42,18 +56,6 @@ public class User  implements Serializable, Parcelable {
     }
 
     public void setPreferences(String preferences) {
-        this.preferences = preferences;
-    }
-
-    private String email;
-    private static String preferences;
-
-    public User(){}
-
-    public User(int id, String name, String email, String preferences){
-        this.id = id;
-        this.name = name;
-        this.email = email;
         this.preferences = preferences;
     }
 
@@ -88,4 +90,22 @@ public class User  implements Serializable, Parcelable {
             return new User[i];
         }
     };
+
+    @Override
+    public void mapJSON(JSONObject object) {
+        try {
+            this.id = object.getInt("id");
+            this.name = object.getString("name");
+            this.email = object.getString("email");
+            this.preferences = object.getString("preferences");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public String toJSON() {
+        return null;
+    }
 }

@@ -129,110 +129,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void loginAttempt(final String username, final String password) {
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            int i;
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                JSONObject unUser;
-                                User user = new User();
-                                for(i=1;i<jsonResponse.length();i++){
-                                    unUser=jsonResponse.getJSONObject(i);
-                                    user = new User(unUser.getInt("id"),
-                                            unUser.getString("name"),
-                                            unUser.getString("email"),
-                                            unUser.getString("preferences"));
-
-                                }
-                                UserManager.getInstance().setUser(user);
-                                Toast.makeText(MainActivity.this, "Login successful for user : " + UserManager.getInstance().getUser().getName(), Toast.LENGTH_LONG).show();
-                                String tag = tagsMap.get(spinSortBy.getSelectedItem().toString());
-                                if(tag==null)tag="";
-                                loadLandmarks(tag);
-                            }
-                            else{
-                                Toast.makeText(MainActivity.this, "Login Unsucessful" , Toast.LENGTH_LONG).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Toast.makeText(MainActivity.this, "Login Unsucessful" , Toast.LENGTH_LONG).show();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MainActivity.this, "Login Unsucessful" , Toast.LENGTH_LONG).show();
-                    }
+        ApiManager<User> apiUser;
+        try {
+            apiUser = new ApiManager<User>(User.class);
+            Map<String, String> params = new HashMap<>();
+            params.put("action", "login");
+            params.put("user", username);
+            params.put("password", ServerManager.md5(password));
+            apiUser.postReturnMappable(ApiManager.getControllerUser(), this, params, new Callback() {
+                @Override
+                public void methodToCallBack(Object object) {
+                    UserManager.getInstance().setUser((User)object);
                 }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les   parametres pour POST
-                params.put("action", "login");
-                params.put("user", username);
-                params.put("password", ServerManager.md5(password));
-                return params;
-            }
-        };
-        Log.d("requete url", requete.getUrl());
-        Volley.newRequestQueue(this).add(requete);
+            });
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     private void createNewUserAttempt(final String name, final String email, final String password, final String preferences) {
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            int i;
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                User user = new User();
-                                user.setPreferences(preferences);
-                                user.setEmail(email);
-                                user.setName(name);
-                                user.setId(jsonResponse.getInt(1));
-                                UserManager.getInstance().setUser(user);
-                                Toast.makeText(MainActivity.this, "User created : "+ UserManager.getInstance().getUser().getName() , Toast.LENGTH_LONG).show();
-                            }
-                            else{
-                                Toast.makeText(MainActivity.this, "User not created" , Toast.LENGTH_LONG).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Toast.makeText(MainActivity.this, "User not created" , Toast.LENGTH_LONG).show();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MainActivity.this, "User not created" , Toast.LENGTH_LONG).show();
-                    }
+        ApiManager<User> apiUser;
+        try {
+            apiUser = new ApiManager<User>(User.class);
+            Map<String, String> params = new HashMap<>();
+            params.put("action", "enregistrer");
+            params.put("name", name);
+            params.put("password", ServerManager.md5(password));
+            params.put("email", email);
+            params.put("preferences", preferences);
+            apiUser.postReturnIdCreated(ApiManager.getControllerUser(), this, params, new Callback() {
+                @Override
+                public void methodToCallBack(Object object) {
+                    User user = new User((Integer) object, name, email, preferences);
+                    UserManager.getInstance().setUser(user);
                 }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les   parametres pour POST
-                params.put("action", "enregistrer");
-                params.put("name", name);
-                params.put("password", ServerManager.md5(password));
-                params.put("email", email);
-                params.put("preferences", preferences);
-                return params;
-            }
-        };
-        Volley.newRequestQueue(this).add(requete);
+            });
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadLandmarks(final String tag) {
@@ -265,67 +199,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             e.printStackTrace();
         }
     }
-
-
-
-        /*final String tags = tag;
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            int i;
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                JSONObject unLandmark;
-                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
-                                for(i=1;i<jsonResponse.length();i++){
-                                    unLandmark=jsonResponse.getJSONObject(i);
-
-                                    if(unLandmark.getString("tags").contains(tags)) {
-                                        Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
-                                        landmarks.add(l);
-
-                                    }else{}
-                                }
-
-                                landmarkList = landmarks;
-                                customAdapter.notifyDataSetChanged();
-                            }
-                            else{
-                                //resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            //resultNotOk();
-                        }
-                        finally {
-                            progress.setVisibility(View.GONE);
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //resultNotOk();
-                        progress.setVisibility(View.GONE);
-                    }
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les parametres pour POST
-                params.put("action", "lister");
-                if(UserManager.getInstance().isLoggin())
-                    params.put("userid", UserManager.getInstance().getUser().getId()+"");
-                return params;
-            }
-        };
-        Log.d("requete url" ,requete.getUrl());
-        Volley.newRequestQueue(this).add(requete);*/
 
 
     private void loadLandmarkById(int id){
@@ -621,111 +494,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void affPreference(final String tags){
         progress.setVisibility(View.VISIBLE);
 
-
-
-
-        final String tag = tags;
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerLandmark(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            int i;
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                JSONObject unLandmark;
-                                ArrayList<Landmark> landmarks = new ArrayList<Landmark>();
-                                for(i=1;i<jsonResponse.length();i++){
-                                    unLandmark=jsonResponse.getJSONObject(i);
-                                    Boolean stop = false;
-
-                                    for(int k = 0 ; k < tabPref.length ; k++) {
-
-                                        if (stop == false) {
-
-                                            if (UserManager.getInstance().getUser().getPreferences().contains(tabPref[k])) {
-                                                if (unLandmark.getString("tags").contains(tabPref[k])) {
-                                                    Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
-                                                    landmarks.add(l);
-                                                    stop = true;
-
-
-                                                }
-
-
-                                            } else if (unLandmark.getString("tags").contains(tags)) {
-                                                Landmark l = getLandmarkFromResponse(jsonResponse.getJSONObject(i));
-                                                landmarks.add(l);
-                                                stop = true;
-                                            }
-                                        }
-                                    }
-
-                                    }
-
-                                landmarkList = landmarks;
-                                customAdapter.notifyDataSetChanged();
+        ApiManager<Landmark> apiLandmark;
+        try {
+            apiLandmark = new ApiManager<Landmark>(Landmark.class);
+            Map<String, String> parameters = new HashMap<String,String>();
+            parameters.put("action", "lister");
+            if(UserManager.getInstance().isLoggin())
+                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
+            apiLandmark.postReturnMappableArray(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
+                @Override
+                public void methodToCallBack(Object object) {
+                    ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
+                    ArrayList<Landmark> filtered = new ArrayList<Landmark>();
+                    for(Landmark landmark: temps) {
+                        for(String pref : tabPref) {
+                            if(landmark.getTags().contains(tags) || (UserManager.getInstance().getUser().getPreferences().contains(pref) && landmark.getTags().contains(pref))){
+                                filtered.add(landmark);
+                                DrawableManager.getInstance().loadImage(landmark.getImage(), MainActivity.this);
+                                break;
                             }
-                            else{
-                                //resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            //resultNotOk();
-                        }
-                        finally {
-                            progress.setVisibility(View.GONE);
                         }
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //resultNotOk();
-                        progress.setVisibility(View.GONE);
-                    }
+                    landmarkList = filtered;
+                    customAdapter.notifyDataSetChanged();
+                    progress.setVisibility(View.GONE);
                 }
-        ) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les parametres pour POST
-                params.put("action", "lister");
-                if(UserManager.getInstance().isLoggin())
-                    params.put("userid", UserManager.getInstance().getUser().getId()+"");
-                return params;
-            }
-        };
-        Log.d("requete url" ,requete.getUrl());
-        Volley.newRequestQueue(this).add(requete);
-    }
-
-
-
-
-
-
-
-
-
-
-    private Landmark getLandmarkFromResponse(JSONObject unLandmark) throws JSONException{
-        Landmark l = new Landmark(unLandmark.getInt("id"),
-                unLandmark.getString("title"),
-                unLandmark.getString("description"),
-                unLandmark.getString("address"),
-                (float) unLandmark.getDouble("latitude"),
-                (float) unLandmark.getDouble("longitude"),
-                unLandmark.getString("url"),
-                (float) unLandmark.getDouble("price"),
-                (float) unLandmark.getDouble("distanceKM"),
-                unLandmark.getString("image"),
-                unLandmark.getString("tags"),
-                unLandmark.getInt("liked") != 0);
-        DrawableManager.getInstance().loadImage(l.getImage(), getApplicationContext());
-
-        return l;
+            });
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 }
