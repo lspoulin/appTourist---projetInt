@@ -114,7 +114,6 @@ public class ResultActivity extends AppCompatActivity {
                     ArrayList<Landmark> filtered = new ArrayList<Landmark>();
                     for(Landmark landmark: temps) {
                         if((landmark.getTags().toLowerCase().contains(tags)) || (landmark.getTitle().toLowerCase().contains(tags)) || (landmark.getDescription().toLowerCase().contains(tags))) {
-
                             filtered.add(landmark);
                             DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
                         }
@@ -122,21 +121,12 @@ public class ResultActivity extends AppCompatActivity {
                     landmarkList = filtered;
                     customAdapter.notifyDataSetChanged();
                     progress.setVisibility(View.GONE);
-                    Intent result = new Intent();
-                    result.putParcelableArrayListExtra(ServerActivity.LANDMARK_LIST, filtered);
-                    resultOk(result);
+
                 }
             });
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-    }
-
-    private void resultOk(Intent result){
-        setResult(RESULT_OK, result);
-        result.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        finish();
-
     }
 
 
