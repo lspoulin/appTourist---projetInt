@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Switch swtPref;
     private Map<String, String> tagsMap = new HashMap<String, String>();
     private boolean comingFromSplash;
+    private final ApiHelper apiHelper = new ApiHelper();
 
 
 
@@ -121,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void showLandmark(final Landmark landmark) {
-
         Intent i;
         i  = new Intent(MainActivity.this, LandmarkActivity.class);
         i.putExtra(LandmarkActivity.LANDMARK, (Parcelable) landmark);
@@ -129,120 +129,84 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void loginAttempt(final String username, final String password) {
-        ApiManager<User> apiUser;
-        try {
-            apiUser = new ApiManager<User>(User.class);
-            Map<String, String> params = new HashMap<>();
-            params.put("action", "login");
-            params.put("user", username);
-            params.put("password", ServerManager.md5(password));
-            apiUser.postReturnMappable(ApiManager.getControllerUser(), this, params, new Callback() {
-                @Override
-                public void methodToCallBack(Object object) {
-                    UserManager.getInstance().setUser((User)object);
-                }
-            });
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+        apiHelper.loginAttempt(username, password, this, new Callback() {
+            @Override
+            public void methodToCallBack(Object object) {
+                UserManager.getInstance().setUser((User)object);
+            }
+        });
     }
 
     private void createNewUserAttempt(final String name, final String email, final String password, final String preferences) {
-        ApiManager<User> apiUser;
-        try {
-            apiUser = new ApiManager<User>(User.class);
-            Map<String, String> params = new HashMap<>();
-            params.put("action", "enregistrer");
-            params.put("name", name);
-            params.put("password", ServerManager.md5(password));
-            params.put("email", email);
-            params.put("preferences", preferences);
-            apiUser.postReturnIdCreated(ApiManager.getControllerUser(), this, params, new Callback() {
-                @Override
-                public void methodToCallBack(Object object) {
-                    User user = new User((Integer) object, name, email, preferences);
-                    UserManager.getInstance().setUser(user);
-                }
-            });
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+        apiHelper.createNewUserAttempt(name, email, password, preferences, this, new Callback() {
+            @Override
+            public void methodToCallBack(Object object) {
+                User user = new User((Integer) object, name, email, preferences);
+                UserManager.getInstance().setUser(user);
+            }
+        });
     }
 
     private void loadLandmarks(final String tag) {
         progress.setVisibility(View.VISIBLE);
-
-        ApiManager<Landmark> apiLandmark;
-        try {
-            apiLandmark = new ApiManager<Landmark>(Landmark.class);
-            Map<String, String> parameters = new HashMap<String,String>();
-            parameters.put("action", "lister");
-            if(UserManager.getInstance().isLoggin())
-                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
-            apiLandmark.postReturnMappableArray(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
-                @Override
-                public void methodToCallBack(Object object) {
-                    ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
-                    ArrayList<Landmark> filtered = new ArrayList<Landmark>();
-                    for(Landmark landmark: temps) {
-                        if(landmark.getTags().contains(tag)) {
-                            filtered.add(landmark);
-                            DrawableManager.getInstance().loadImage(landmark.getImage(), MainActivity.this);
-                        }
+        apiHelper.loadLandmarks(tag, this, new Callback() {
+            @Override
+            public void methodToCallBack(Object object) {
+                ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
+                ArrayList<Landmark> filtered = new ArrayList<Landmark>();
+                for(Landmark landmark: temps) {
+                    if(landmark.getTags().contains(tag)) {
+                        filtered.add(landmark);
+                        DrawableManager.getInstance().loadImage(landmark.getImage(), MainActivity.this);
                     }
-                    landmarkList = filtered;
-                    customAdapter.notifyDataSetChanged();
-                    progress.setVisibility(View.GONE);
                 }
-            });
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+                landmarkList = filtered;
+                customAdapter.notifyDataSetChanged();
+                progress.setVisibility(View.GONE);
+            }
+        });
     }
 
 
     private void loadLandmarkById(int id){
-        ApiManager<Landmark> apiLandmark;
-        try {
-            apiLandmark = new ApiManager<Landmark>(Landmark.class);
-            Map<String, String> parameters = new HashMap<String,String>();
-            parameters.put("action", "listerParId");
-            parameters.put("id", id+"");
-            if(UserManager.getInstance().isLoggin())
-                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
-            apiLandmark.postReturnMappable(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
-                @Override
-                public void methodToCallBack(Object object) {
-                    Landmark landmark = (Landmark) object;
-                    DrawableManager.getInstance().loadImage(landmark.getImage(), MainActivity.this);
-                    showLandmark(landmark);
+        apiHelper.loadLandmarkById(id, this, new Callback() {
+            @Override
+            public void methodToCallBack(Object object) {
+                Landmark landmark = (Landmark) object;
+                DrawableManager.getInstance().loadImage(landmark.getImage(), MainActivity.this);
+                showLandmark(landmark);
+            }
+        });
+    }
+
+    private void affPreference(final String tags){
+        progress.setVisibility(View.VISIBLE);
+        apiHelper.loadLandmarks(tags, this, new Callback() {
+            @Override
+            public void methodToCallBack(Object object) {
+                if(object == null) return;
+                ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
+                if (temps == null) return;
+                ArrayList<Landmark> filtered = new ArrayList<Landmark>();
+                for(Landmark landmark: temps) {
+                    for(String pref : tabPref) {
+                        if(landmark.getTags().contains(tags) || (UserManager.getInstance().getUser().getPreferences().contains(pref) && landmark.getTags().contains(pref))){
+                            filtered.add(landmark);
+                            DrawableManager.getInstance().loadImage(landmark.getImage(), MainActivity.this);
+                            break;
+                        }
+                    }
                 }
-            });
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+                landmarkList = filtered;
+                customAdapter.notifyDataSetChanged();
+                progress.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-
-        if(requestCode == CODE_LANDMARK && resultCode == ServerActivity.RESULT_OK){
-            ArrayList<Landmark> listerLandmark = intent.getParcelableArrayListExtra(ServerActivity.LANDMARK_LIST);
-
-            int id = intent.getIntExtra(LandmarkActivity.LANDMARK_ID, -1);
-            if (id == -1)return;
-            boolean liked = intent.getBooleanExtra(LandmarkActivity.LIKED, false);
-
-            for(Landmark l : landmarkList){
-                if (l.getId()==id) {
-                    l.setLiked(liked);
-                    break;
-                }
-            }
-
-            customAdapter.notifyDataSetChanged();
-        }
 
     }
 
@@ -270,8 +234,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-
-
         mainListView = (ListView) findViewById(R.id.listAct);
         customAdapter = new CustomAdapter();
         DrawableManager.getInstance().setListener(customAdapter);
@@ -290,9 +252,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         else
             comingFromSplash = false;
 
-      
-
-
         mainListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -310,9 +269,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onClick(View view) {
         if(view.getId() == R.id.btnFav){
-
-
-
             if (UserManager.getInstance().isLoggin()){
 
                     ArrayList<Landmark> landmarkLiked = new ArrayList<Landmark>();
@@ -322,25 +278,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     landmarkListToSend = landmarkLiked;
 
+                    Intent intent;
+                    intent  = new Intent(MainActivity.this, FavoriteActivity.class);
 
-                    Intent intente;
-                    intente  = new Intent(MainActivity.this, FavoriteActivity.class);
-
-                    intente.putParcelableArrayListExtra("Liste", (ArrayList<? extends Parcelable>) landmarkListToSend);
-                    startActivity(intente);
+                    intent.putParcelableArrayListExtra("Liste", (ArrayList<? extends Parcelable>) landmarkListToSend);
+                    startActivity(intent);
                     //customAdapter.notifyDataSetChanged();
                 }
-
-
             else{
                 showUserLogin();
             }
 
-
-
         }else if(view.getId() == R.id.btnUser){
             if (UserManager.getInstance().isLoggin()){
-
             }
             else{
                 showUserLogin();
@@ -350,29 +300,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (UserManager.getInstance().isLoggin()){
                 Intent i;
                 i  = new Intent(MainActivity.this, PreferenceActivity.class);
-
                 i.putExtra(PreferenceActivity.PREFERENCE, UserManager.getInstance().getUser().getPreferences());
-
                 startActivity(i);
             }
             else{
                 showUserLogin();
             }
-
-
-
         }else if(view.getId() == R.id.btnSrch){
-            //Toast.makeText(this, "Button Srch CLicked", Toast.LENGTH_LONG). show();
             Intent i;
             i  = new Intent(MainActivity.this, SearchActivity.class);
-
             startActivity(i);
 
         }
-    }
-
-    private void showUserSetting() {
-        Toast.makeText(this, "Show user settings", Toast.LENGTH_LONG). show();
     }
 
     private void showUserLogin() {
@@ -488,40 +427,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Drawable imageDrawable = new BitmapDrawable(getResources(), bitmap);
             image.setImageDrawable(imageDrawable);
             return view;
-        }
-    }
-
-    public void affPreference(final String tags){
-        progress.setVisibility(View.VISIBLE);
-
-        ApiManager<Landmark> apiLandmark;
-        try {
-            apiLandmark = new ApiManager<Landmark>(Landmark.class);
-            Map<String, String> parameters = new HashMap<String,String>();
-            parameters.put("action", "lister");
-            if(UserManager.getInstance().isLoggin())
-                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
-            apiLandmark.postReturnMappableArray(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
-                @Override
-                public void methodToCallBack(Object object) {
-                    ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
-                    ArrayList<Landmark> filtered = new ArrayList<Landmark>();
-                    for(Landmark landmark: temps) {
-                        for(String pref : tabPref) {
-                            if(landmark.getTags().contains(tags) || (UserManager.getInstance().getUser().getPreferences().contains(pref) && landmark.getTags().contains(pref))){
-                                filtered.add(landmark);
-                                DrawableManager.getInstance().loadImage(landmark.getImage(), MainActivity.this);
-                                break;
-                            }
-                        }
-                    }
-                    landmarkList = filtered;
-                    customAdapter.notifyDataSetChanged();
-                    progress.setVisibility(View.GONE);
-                }
-            });
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
         }
     }
 }

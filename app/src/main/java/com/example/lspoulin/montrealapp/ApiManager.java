@@ -233,6 +233,42 @@ public class ApiManager<T extends Mappable> {
 
     }
 
+    public void post(String url, Context context, final Map<String, String> params, final Callback callback){
+        StringRequest requete = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            int i;
+                            JSONArray jsonResponse = new JSONArray(response);
+                            String msg = jsonResponse.getString(0);
+                            if(msg.equals("OK")){
+                                callback.methodToCallBack(true);
+                            }
+                            else{
+                                callback.methodToCallBack(false);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            callback.methodToCallBack(null);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        callback.methodToCallBack(null);
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                return params;
+            }
+        };
+        Volley.newRequestQueue(context).add(requete);
+
+    }
 
 
 

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SplashActivity extends AppCompatActivity implements Callback {
+public class SplashActivity extends AppCompatActivity {
     public final static String LANDMARK_LIST = "com.example.lspoulin.montrealapp.SplashActivity.landmarklist";
     private ArrayList<Landmark> landmarkArrayList;
 
@@ -41,33 +41,22 @@ public class SplashActivity extends AppCompatActivity implements Callback {
         new LongOperation().execute("");
     }
 
-    @Override
-    public void methodToCallBack(Object object) {
-        landmarkArrayList = (ArrayList<Landmark>) object;
-        for(Landmark landmark:landmarkArrayList){
-            DrawableManager.getInstance().loadImage(landmark.getImage(), this);
-        }
-        finish();
-
-    }
-
     private class LongOperation extends AsyncTask<String, Void, String> {
         @Override
 
         protected String doInBackground(String... params) {
-            ApiManager<Landmark> apiLandmark;
-            try {
-                apiLandmark = new ApiManager<Landmark>(Landmark.class);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-                return null;
-            }
+            ApiHelper apiHelper = new ApiHelper();
 
-            Map<String, String> parameters = new HashMap<String,String>();
-            parameters.put("action", "lister");
-            if(UserManager.getInstance().isLoggin())
-                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
-            apiLandmark.postReturnMappableArray(ApiManager.getControllerLandmark(), SplashActivity.this,parameters , SplashActivity.this);
+            apiHelper.loadLandmarks("", SplashActivity.this, new Callback() {
+                @Override
+                public void methodToCallBack(Object object) {
+                    landmarkArrayList = (ArrayList<Landmark>) object;
+                    for(Landmark landmark:landmarkArrayList){
+                        DrawableManager.getInstance().loadImage(landmark.getImage(), SplashActivity.this);
+                    }
+                    finish();
+                }
+            });
 
             return null;
         }

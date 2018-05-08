@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,20 +17,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FavoriteActivity  extends AppCompatActivity {
     private ImageButton btnBack;
@@ -40,12 +27,14 @@ public class FavoriteActivity  extends AppCompatActivity {
     private FavoriteActivity.CustomAdapter customAdapter;
     ListView mainListView;
     private ProgressBar progress;
+    private ApiHelper apiHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite);
 
+        apiHelper = new ApiHelper();
         landmarkList = new ArrayList<Landmark>();
 
         Bundle bundle= getIntent().getExtras();
@@ -54,15 +43,12 @@ public class FavoriteActivity  extends AppCompatActivity {
 
         landmarkList = landmarkListReceive;
 
-
         progress = (ProgressBar) findViewById(R.id.progressBar);
         progress.setVisibility(View.GONE);
         mainListView = (ListView) findViewById(R.id.listAffResult);
         customAdapter = new FavoriteActivity.CustomAdapter();
         DrawableManager.getInstance().setListener(customAdapter);
         mainListView.setAdapter(customAdapter);
-
-
 
         btnBack = (ImageButton) findViewById(R.id.btnResultBack);
 
@@ -94,25 +80,16 @@ public class FavoriteActivity  extends AppCompatActivity {
 
 
     private void loadLandmarkById(int id){
-        ApiManager<Landmark> apiLandmark;
-        try {
-            apiLandmark = new ApiManager<Landmark>(Landmark.class);
-            Map<String, String> parameters = new HashMap<String,String>();
-            parameters.put("action", "listerParId");
-            parameters.put("id", id+"");
-            if(UserManager.getInstance().isLoggin())
-                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
-            apiLandmark.postReturnMappable(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
-                @Override
-                public void methodToCallBack(Object object) {
-                    Landmark landmark = (Landmark) object;
-                    DrawableManager.getInstance().loadImage(landmark.getImage(), FavoriteActivity.this);
-                    showLandmark(landmark);
-                }
-            });
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+        apiHelper.loadLandmarkById(id, this, new Callback() {
+            @Override
+            public void methodToCallBack(Object object) {
+                if (object == null) return;
+                Landmark landmark = (Landmark) object;
+                if(landmark == null) return;
+                DrawableManager.getInstance().loadImage(landmark.getImage(), FavoriteActivity.this);
+                showLandmark(landmark);
+            }
+        });
     }
 
     class CustomAdapter extends BaseAdapter {

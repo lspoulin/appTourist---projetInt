@@ -34,12 +34,15 @@ public class LandmarkActivity extends AppCompatActivity {
 
     private ImageButton btnBack;
     private  Landmark landmark;
+    private ApiHelper apiHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landmark);
+
+        apiHelper = new ApiHelper();
 
         Intent intent = getIntent();
 
@@ -101,7 +104,6 @@ public class LandmarkActivity extends AppCompatActivity {
             }
         });
 
-
         liked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,11 +119,6 @@ public class LandmarkActivity extends AppCompatActivity {
                 }
             }
         });
-
-        //test
-
-
-
     }
 
     @Override
@@ -136,91 +133,21 @@ public class LandmarkActivity extends AppCompatActivity {
     }
 
     private void landmarkUnliked(final int userid, final int landmarkid) {
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                //Intent result = new Intent();
-                                //resultOk(result);
-                            }
-                            else{
-                                //resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            //resultNotOk();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //resultNotOk();
-                    }
-                }
-        ) {
+        apiHelper.landmarkUnliked(userid, landmarkid, this, new Callback() {
             @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les   parametres pour POST
-                params.put("action", "activityUnLiked");
-                params.put("userid", String.valueOf(userid));
-                params.put("activityid", String.valueOf(landmarkid));
+            public void methodToCallBack(Object object) {
 
-                Log.d("Unliked param", String.valueOf(userid) + " " + String.valueOf(landmarkid));
-
-                return params;
             }
-        };
-        Volley.newRequestQueue(this).add(requete);
+        });
     }
 
     private void landmarkLiked(final int userid, final int landmarkid) {
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                //Intent result = new Intent();
-                                //resultOk(result);
-                            }
-                            else{
-                                //resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            //resultNotOk();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //resultNotOk();
-                    }
-                }
-        ) {
+        apiHelper.landmarkLiked(userid, landmarkid, this, new Callback() {
             @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les   parametres pour POST
-                params.put("action", "activityLiked");
-                params.put("userid", String.valueOf(userid));
-                params.put("activityid", String.valueOf(landmarkid));
+            public void methodToCallBack(Object object) {
 
-                return params;
             }
-        };
-        Volley.newRequestQueue(this).add(requete);
+        });
     }
 
 }

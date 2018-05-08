@@ -100,49 +100,13 @@ public class PreferenceActivity extends AppCompatActivity {
 
     private void saveUserPreferences(final String preferences) {
         UserManager.getInstance().getUser().setPreferences(newPref);
-        StringRequest requete = new StringRequest(Request.Method.POST, ServerManager.getControllerUser(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("RESULTAT", response);
-                            int i;
-                            JSONArray jsonResponse = new JSONArray(response);
-                            String msg = jsonResponse.getString(0);
-                            if(msg.equals("OK")){
-                                Intent result = new Intent();
-                                result.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                                resultOk(result);
-                            }
-                            else{
-                                resultNotOk();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            resultNotOk();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        resultNotOk();
-                    }
-                }
-        ) {
+        ApiHelper apiHelper = new ApiHelper();
+        apiHelper.saveUser(this, new Callback() {
             @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                // Les parametres pour POST
-                params.put("action", "maj");
-                params.put("id", UserManager.getInstance().getUser().getId()+"");
-                params.put("preferences", UserManager.getInstance().getUser().getPreferences());
-                params.put("email", UserManager.getInstance().getUser().getEmail());
-                params.put("name", UserManager.getInstance().getUser().getName());
-                return params;
+            public void methodToCallBack(Object object) {
+
             }
-        };
-        Volley.newRequestQueue(this).add(requete);
+        });
     }
 
     public void loadPref(String listPref) {

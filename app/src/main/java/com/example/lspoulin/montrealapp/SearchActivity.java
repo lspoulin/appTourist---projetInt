@@ -37,9 +37,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         btnRecherche.setOnClickListener(this);
         btnBack.setOnClickListener(this);
-
-
-
     }
 
     @Override
@@ -49,27 +46,19 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             strSort = spinSortBy.getSelectedItem().toString();
 
             strKeyWord = motsClef.getText().toString();
-
-
             if(strKeyWord == null){
                 strKeyWord = "";
             }
 
             Intent i ;
             i  = new Intent(SearchActivity.this, ResultActivity.class);
-
-
             i.putExtra("KeyWord", strKeyWord);
             i.putExtra("Preference", strSort);
-
 
             startActivity(i);
 
 
         }else if((view.getId() == R.id.btnSearchBack)){
-
-
-
             finish();
         }
 

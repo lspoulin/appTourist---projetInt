@@ -149,7 +149,7 @@ public class DrawableManager {
                 addDrawable(image, bitmap);
                 Log.d("Image added :", image);
             } else {
-                ImageRequest request = new ImageRequest(ServerManager.getPhotoURL(image),
+                ImageRequest request = new ImageRequest(ApiManager.getPhotoURL(image),
                         new Response.Listener<Bitmap>() {
                             @Override
                             public void onResponse(Bitmap bitmap) {

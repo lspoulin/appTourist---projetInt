@@ -1,5 +1,6 @@
 package com.example.lspoulin.montrealapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -31,9 +32,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static com.example.lspoulin.montrealapp.ServerManager.getControllerLandmark;
 
 public class ResultActivity extends AppCompatActivity {
 
@@ -42,12 +40,14 @@ public class ResultActivity extends AppCompatActivity {
     private ResultActivity.CustomAdapter customAdapter;
     ListView mainListView;
     private ProgressBar progress;
+    private ApiHelper apiHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.result_activity);
 
+        apiHelper = new ApiHelper();
         Intent i = getIntent();
         String key = i.getStringExtra("KeyWord");
         String sort = i.getStringExtra("Preference");
@@ -91,74 +91,55 @@ public class ResultActivity extends AppCompatActivity {
 
         progress.setVisibility(View.VISIBLE);
         final String tags = key.toLowerCase();
-        Map<String, String> params = new HashMap<>();
-        // Les parametres pour POST
-        params.put("action", "listerParDistance");
-        params.put("latitude", latitude+"");
-        params.put("longitude", longitude+"");
-        if(UserManager.getInstance().isLoggin() && UserManager.getInstance().getUser() != null) {
-            params.put("userid", UserManager.getInstance().getUser().getId() + "");
-        }
-
-        ApiManager<Landmark> apiLandmark;
-        try {
-            apiLandmark = new ApiManager<Landmark>(Landmark.class);
-            Map<String, String> parameters = new HashMap<String,String>();
-            parameters.put("action", "lister");
-            if(UserManager.getInstance().isLoggin())
-                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
-            apiLandmark.postReturnMappableArray(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
-                @Override
-                public void methodToCallBack(Object object) {
-                    ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
-                    ArrayList<Landmark> filtered = new ArrayList<Landmark>();
-                    for(Landmark landmark: temps) {
-                        if((landmark.getTags().toLowerCase().contains(tags)) || (landmark.getTitle().toLowerCase().contains(tags)) || (landmark.getDescription().toLowerCase().contains(tags))) {
-                            filtered.add(landmark);
-                            DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
-                        }
+        apiHelper.listerLandmarkByDistance(latitude, longitude, tags, this, new Callback() {
+            @Override
+            public void methodToCallBack(Object object) {
+                ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
+                ArrayList<Landmark> filtered = new ArrayList<Landmark>();
+                for(Landmark landmark: temps) {
+                    if((landmark.getTags().toLowerCase().contains(tags)) || (landmark.getTitle().toLowerCase().contains(tags)) || (landmark.getDescription().toLowerCase().contains(tags))) {
+                        filtered.add(landmark);
+                        DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
                     }
-                    landmarkList = filtered;
-                    customAdapter.notifyDataSetChanged();
-                    progress.setVisibility(View.GONE);
-
                 }
-            });
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
+                landmarkList = filtered;
+                customAdapter.notifyDataSetChanged();
+                progress.setVisibility(View.GONE);
+            }
+        });
 
+
+    }
 
     private void loadLandmarks(final String tag) {
         progress.setVisibility(View.VISIBLE);
-
-        ApiManager<Landmark> apiLandmark;
-        try {
-            apiLandmark = new ApiManager<Landmark>(Landmark.class);
-            Map<String, String> parameters = new HashMap<String,String>();
-            parameters.put("action", "lister");
-            if(UserManager.getInstance().isLoggin())
-                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
-            apiLandmark.postReturnMappableArray(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
-                @Override
-                public void methodToCallBack(Object object) {
-                    ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
-                    ArrayList<Landmark> filtered = new ArrayList<Landmark>();
-                    for(Landmark landmark: temps) {
-                        if(landmark.getTags().contains(tag)) {
-                            filtered.add(landmark);
-                            DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
-                        }
+        apiHelper.loadLandmarks(tag, this, new Callback() {
+            @Override
+            public void methodToCallBack(Object object) {
+                ArrayList<Landmark> temps = (ArrayList<Landmark>) object;
+                ArrayList<Landmark> filtered = new ArrayList<Landmark>();
+                for(Landmark landmark: temps) {
+                    if(landmark.getTags().contains(tag)) {
+                        filtered.add(landmark);
+                        DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
                     }
-                    landmarkList = filtered;
-                    customAdapter.notifyDataSetChanged();
-                    progress.setVisibility(View.GONE);
                 }
-            });
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+                landmarkList = filtered;
+                customAdapter.notifyDataSetChanged();
+                progress.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void loadLandmarkById(int id){
+        apiHelper.loadLandmarkById(id, this, new Callback() {
+            @Override
+            public void methodToCallBack(Object object) {
+                Landmark landmark = (Landmark) object;
+                DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
+                showLandmark(landmark);
+            }
+        });
     }
 
     class CustomAdapter extends BaseAdapter {
@@ -197,34 +178,11 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private void showLandmark(final Landmark landmark) {
-
         Intent i;
         i  = new Intent(ResultActivity.this, LandmarkActivity.class);
         i.putExtra(LandmarkActivity.LANDMARK, (Parcelable) landmark);
         startActivity(i);
     }
 
-
-    private void loadLandmarkById(int id){
-        ApiManager<Landmark> apiLandmark;
-        try {
-            apiLandmark = new ApiManager<Landmark>(Landmark.class);
-            Map<String, String> parameters = new HashMap<String,String>();
-            parameters.put("action", "listerParId");
-            parameters.put("id", id+"");
-            if(UserManager.getInstance().isLoggin())
-                parameters.put("userid", UserManager.getInstance().getUser().getId()+"");
-            apiLandmark.postReturnMappable(ApiManager.getControllerLandmark(), this, parameters, new Callback() {
-                @Override
-                public void methodToCallBack(Object object) {
-                    Landmark landmark = (Landmark) object;
-                    DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
-                    showLandmark(landmark);
-                }
-            });
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
 
 }
