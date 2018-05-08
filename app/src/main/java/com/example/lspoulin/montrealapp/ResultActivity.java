@@ -53,7 +53,7 @@ public class ResultActivity extends AppCompatActivity {
         String sort = i.getStringExtra("Preference");
 
         landmarkList = new ArrayList<Landmark>();
-        
+
         progress = (ProgressBar) findViewById(R.id.progressBar);
         progress.setVisibility(View.GONE);
         mainListView = (ListView) findViewById(R.id.listAffResult);
@@ -132,20 +132,11 @@ public class ResultActivity extends AppCompatActivity {
         }
     }
 
-
-    private void resultNotOk(){
-        Intent result = new Intent();
-        setResult(RESULT_CANCELED, result);
-        result.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        //ServerActivity.this.finish();
-        overridePendingTransition(0, 0);
-    }
-
     private void resultOk(Intent result){
         setResult(RESULT_OK, result);
         result.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        //ServerActivity.this.finish();
-        overridePendingTransition(0, 0);
+        finish();
+
     }
 
 
@@ -179,24 +170,6 @@ public class ResultActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    private Landmark getLandmarkFromResponse(JSONObject unLandmark) throws JSONException{
-        Landmark l = new Landmark(unLandmark.getInt("id"),
-                unLandmark.getString("title"),
-                unLandmark.getString("description"),
-                unLandmark.getString("address"),
-                (float) unLandmark.getDouble("latitude"),
-                (float) unLandmark.getDouble("longitude"),
-                unLandmark.getString("url"),
-                (float) unLandmark.getDouble("price"),
-                (float) unLandmark.getDouble("distanceKM"),
-                unLandmark.getString("image"),
-                unLandmark.getString("tags"),
-                unLandmark.getInt("liked") != 0);
-        DrawableManager.getInstance().loadImage(l.getImage(), getApplicationContext());
-
-        return l;
-    }
-
 
     class CustomAdapter extends BaseAdapter {
 
