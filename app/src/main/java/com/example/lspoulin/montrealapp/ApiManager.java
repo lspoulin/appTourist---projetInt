@@ -25,13 +25,9 @@ import java.util.Map;
 
 
 public class ApiManager<T extends Mappable> {
-    public static final boolean LOCAL_SERVER = true;
-    public static final String BASE_URL = "https://apptouristprojetint.000webhostapp.com/PHP/";
-    public static final String BASE_URL_PHOTO = "https://apptouristprojetint.000webhostapp.com/photos/";
-    public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "activityControleurJSON.php";
-    public static final String CONTROLLEUR_USER_ENDPOINT = "userControleurJSON.php";
-    public static final String LOCAL_BASE_URL = "http://10.0.2.2:8888/ProjetFinal/PHP/";
-    public static final String LOCAL_BASE_URL_PHOTO = "http://10.0.2.2:8888/ProjetFinal/photos/";
+    public static final String CONTROLLEUR_LANDMARK_ENDPOINT = "/PHP/activityControleurJSON.php";
+    public static final String CONTROLLEUR_USER_ENDPOINT = "/PHP/userControleurJSON.php";
+    public static final String PHOTO_ENDPOINT = "photos/";
 
     // This is a convoluted way to create instances of the template type
     private final Constructor<? extends T> ctor;
@@ -44,24 +40,15 @@ public class ApiManager<T extends Mappable> {
 
 
     public static String getControllerLandmark() {
-        if (LOCAL_SERVER)
-            return LOCAL_BASE_URL + CONTROLLEUR_LANDMARK_ENDPOINT;
-        else
-            return BASE_URL + CONTROLLEUR_LANDMARK_ENDPOINT;
+        return BuildConfig.BASE_URL + CONTROLLEUR_LANDMARK_ENDPOINT;
     }
 
     public static String getControllerUser() {
-        if (LOCAL_SERVER)
-            return LOCAL_BASE_URL + CONTROLLEUR_USER_ENDPOINT;
-        else
-            return BASE_URL + CONTROLLEUR_USER_ENDPOINT;
+        return BuildConfig.BASE_URL + CONTROLLEUR_USER_ENDPOINT;
     }
 
     public static String getPhotoURL(String image) {
-        if (LOCAL_SERVER)
-            return LOCAL_BASE_URL_PHOTO + image;
-        else
-            return BASE_URL_PHOTO + image;
+        return BuildConfig.BASE_URL + PHOTO_ENDPOINT + image;
     }
 
     public static final String md5(final String s) {
