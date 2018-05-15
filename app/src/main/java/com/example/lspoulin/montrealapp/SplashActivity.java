@@ -31,9 +31,6 @@ public class SplashActivity extends AppCompatActivity {
                 @Override
                 public void methodToCallBack(Object object) {
                     landmarkArrayList = (ArrayList<Landmark>) object;
-                    for(Landmark landmark:landmarkArrayList){
-                        DrawableManager.getInstance().loadImage(landmark.getImage(), SplashActivity.this);
-                    }
                     finish();
                 }
             });

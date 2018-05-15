@@ -25,6 +25,9 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -135,7 +138,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 for(Landmark landmark: temps) {
                     if(landmark.getTags().contains(tag)) {
                         filtered.add(landmark);
-                        DrawableManager.getInstance().loadImage(landmark.getImage(), MainActivity.this);
                     }
                 }
                 landmarkList = filtered;
@@ -151,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void methodToCallBack(Object object) {
                 Landmark landmark = (Landmark) object;
-                DrawableManager.getInstance().loadImage(landmark.getImage(), MainActivity.this);
                 showLandmark(landmark);
             }
         });
@@ -170,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     for(String pref : tabPref) {
                         if(landmark.getTags().contains(tags) || (UserManager.getInstance().getUser().getPreferences().contains(pref) && landmark.getTags().contains(pref))){
                             filtered.add(landmark);
-                            DrawableManager.getInstance().loadImage(landmark.getImage(), MainActivity.this);
                             break;
                         }
                     }
@@ -214,7 +214,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         mainListView = (ListView) findViewById(R.id.listAct);
         customAdapter = new CustomAdapter();
-        DrawableManager.getInstance().setListener(customAdapter);
         mainListView.setAdapter(customAdapter);
 
         String tag = tagsMap.get(spinSortBy.getSelectedItem());
@@ -399,9 +398,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Landmark l = landmarkList.get(i);
             title.setText(l.getTitle());
             adresse.setText(l.getAddress());
-            Bitmap bitmap = DrawableManager.getInstance().getDrawable(l.getImage());
-            Drawable imageDrawable = new BitmapDrawable(getResources(), bitmap);
-            image.setImageDrawable(imageDrawable);
+
+            Picasso.get().load(ApiManager.getPhotoURL(l.getImage())).into(image);
+
             return view;
         }
     }

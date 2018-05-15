@@ -17,6 +17,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +49,7 @@ public class FavoriteActivity  extends AppCompatActivity {
         progress.setVisibility(View.GONE);
         mainListView = (ListView) findViewById(R.id.listAffResult);
         customAdapter = new FavoriteActivity.CustomAdapter();
-        DrawableManager.getInstance().setListener(customAdapter);
+        //DrawableManager.getInstance().setListener(customAdapter);
         mainListView.setAdapter(customAdapter);
 
         btnBack = (ImageButton) findViewById(R.id.btnResultBack);
@@ -86,7 +88,7 @@ public class FavoriteActivity  extends AppCompatActivity {
                 if (object == null) return;
                 Landmark landmark = (Landmark) object;
                 if(landmark == null) return;
-                DrawableManager.getInstance().loadImage(landmark.getImage(), FavoriteActivity.this);
+                //DrawableManager.getInstance().loadImage(landmark.getImage(), FavoriteActivity.this);
                 showLandmark(landmark);
             }
         });
@@ -120,9 +122,8 @@ public class FavoriteActivity  extends AppCompatActivity {
             Landmark l = landmarkList.get(i);
             title.setText(l.getTitle());
             adresse.setText(l.getAddress());
-            Bitmap bitmap = DrawableManager.getInstance().getDrawable(l.getImage());
-            Drawable imageDrawable = new BitmapDrawable(getResources(), bitmap);
-            image.setImageDrawable(imageDrawable);
+
+            Picasso.get().load(ApiManager.getPhotoURL(l.getImage())).into(image);
             return view;
         }
     }

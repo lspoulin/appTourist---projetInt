@@ -16,6 +16,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +47,6 @@ public class ResultActivity extends AppCompatActivity {
         progress.setVisibility(View.GONE);
         mainListView = (ListView) findViewById(R.id.listAffResult);
         customAdapter = new ResultActivity.CustomAdapter();
-        DrawableManager.getInstance().setListener(customAdapter);
         mainListView.setAdapter(customAdapter);
 
         btnBack = (ImageButton)findViewById(R.id.btnResultBack) ;
@@ -85,7 +87,6 @@ public class ResultActivity extends AppCompatActivity {
                 for(Landmark landmark: temps) {
                     if((landmark.getTags().toLowerCase().contains(tags)) || (landmark.getTitle().toLowerCase().contains(tags)) || (landmark.getDescription().toLowerCase().contains(tags))) {
                         filtered.add(landmark);
-                        DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
                     }
                 }
                 landmarkList = filtered;
@@ -107,7 +108,6 @@ public class ResultActivity extends AppCompatActivity {
                 for(Landmark landmark: temps) {
                     if(landmark.getTags().contains(tag)) {
                         filtered.add(landmark);
-                        DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
                     }
                 }
                 landmarkList = filtered;
@@ -122,7 +122,6 @@ public class ResultActivity extends AppCompatActivity {
             @Override
             public void methodToCallBack(Object object) {
                 Landmark landmark = (Landmark) object;
-                DrawableManager.getInstance().loadImage(landmark.getImage(), ResultActivity.this);
                 showLandmark(landmark);
             }
         });
@@ -156,9 +155,7 @@ public class ResultActivity extends AppCompatActivity {
             Landmark l = landmarkList.get(i);
             title.setText(l.getTitle());
             adresse.setText(l.getAddress());
-            Bitmap bitmap = DrawableManager.getInstance().getDrawable(l.getImage());
-            Drawable imageDrawable = new BitmapDrawable(getResources(), bitmap);
-            image.setImageDrawable(imageDrawable);
+            Picasso.get().load(ApiManager.getPhotoURL(l.getImage())).into(image);
             return view;
         }
     }

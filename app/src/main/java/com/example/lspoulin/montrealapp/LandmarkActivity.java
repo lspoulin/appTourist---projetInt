@@ -13,6 +13,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 public class LandmarkActivity extends AppCompatActivity {
     public static final String LANDMARK = "com.example.lspoulimn.montrealapp.landmarkActivity.landmark";
     public static final String LANDMARK_ID = "com.example.lspoulimn.montrealapp.landmarkActivity.landmarkid";
@@ -52,10 +54,14 @@ public class LandmarkActivity extends AppCompatActivity {
         title.setText(landmark.getTitle());
         address.setText(landmark.getAddress());
         description.setText(landmark.getDescription());
-        DrawableManager.getInstance().setListener(imageView);
-        Bitmap bitmap = DrawableManager.getInstance().getDrawable(landmark.getImage());
-        Drawable imageDrawable = new BitmapDrawable(getResources(), bitmap);
-        imageView.setImageDrawable(imageDrawable);
+
+        Picasso.get().load(ApiManager.getPhotoURL(landmark.getImage())).into(imageView);
+
+
+        //DrawableManager.getInstance().setListener(imageView);
+        //Bitmap bitmap = DrawableManager.getInstance().getDrawable(landmark.getImage());
+        //Drawable imageDrawable = new BitmapDrawable(getResources(), bitmap);
+        //imageView.setImageDrawable(imageDrawable);
 
         if(!UserManager.getInstance().isLoggin()){
             liked.setVisibility(View.GONE);
