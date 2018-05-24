@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Switch swtPref;
     private Map<String, String> tagsMap = new HashMap<String, String>();
     private boolean comingFromSplash;
-    private final ApiHelper apiHelper = new ApiHelper();
+    private ApiHelper apiHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         progress = (ProgressBar) findViewById(R.id.progressBar);
         progress.setVisibility(View.GONE);
         swtPref= (Switch) findViewById(R.id.switchPref);
+        apiHelper = new ApiHelper(getApplicationContext());
 
         tabPref = new String[7];
 
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         apiHelper.loginAttempt(username, password, this, new Callback() {
             @Override
             public void methodToCallBack(Object object) {
-                UserManager.getInstance().setUser((User)object);
+                UserManager.getInstance().setUser((User)object, getApplicationContext());
             }
         });
     }
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void methodToCallBack(Object object) {
                 User user = new User((Integer) object, name, email, preferences);
-                UserManager.getInstance().setUser(user);
+                UserManager.getInstance().setUser(user, getApplicationContext());
             }
         });
     }

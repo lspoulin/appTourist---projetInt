@@ -36,7 +36,7 @@ public class ResultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.result_activity);
 
-        apiHelper = new ApiHelper();
+        apiHelper = new ApiHelper(getApplicationContext());
         Intent i = getIntent();
         String key = i.getStringExtra("KeyWord");
         String sort = i.getStringExtra("Preference");
@@ -79,7 +79,7 @@ public class ResultActivity extends AppCompatActivity {
 
         progress.setVisibility(View.VISIBLE);
         final String tags = key.toLowerCase();
-        apiHelper.listerLandmarkByDistance(latitude, longitude, tags, this, new Callback() {
+        apiHelper.listerLandmarkByDistance(latitude, longitude, tags, new Callback() {
             @Override
             public void methodToCallBack(Object object) {
                 ArrayList<Landmark> temps = (ArrayList<Landmark>) object;

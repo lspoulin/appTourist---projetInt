@@ -31,10 +31,12 @@ public class ApiManager<T extends Mappable> {
 
     // This is a convoluted way to create instances of the template type
     private final Constructor<? extends T> ctor;
+    private Context context;
 
     private T field;
 
-    ApiManager(Class<? extends T> impl) throws NoSuchMethodException {
+    ApiManager(Class<? extends T> impl, Context context) throws NoSuchMethodException {
+        this.context = context;
         this.ctor = impl.getConstructor();
     }
 
@@ -76,7 +78,7 @@ public class ApiManager<T extends Mappable> {
         return "";
     }
 
-    public void postReturnMappableArray(String url, Context context, final Map<String, String> params, final Callback callback){
+    public void postReturnMappableArray(String url, final Map<String, String> params, final Callback callback){
         StringRequest requete = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -127,7 +129,7 @@ public class ApiManager<T extends Mappable> {
     }
 
 
-    public void postReturnMappable(String url, Context context, final Map<String, String> params, final Callback callback){
+    public void postReturnMappable(String url, final Map<String, String> params, final Callback callback){
         StringRequest requete = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -177,7 +179,7 @@ public class ApiManager<T extends Mappable> {
 
     }
 
-    public void postReturnIdCreated(String url, Context context, final Map<String, String> params, final Callback callback){
+    public void postReturnIdCreated(String url, final Map<String, String> params, final Callback callback){
         StringRequest requete = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -214,7 +216,7 @@ public class ApiManager<T extends Mappable> {
 
     }
 
-    public void post(String url, Context context, final Map<String, String> params, final Callback callback){
+    public void post(String url, final Map<String, String> params, final Callback callback){
         StringRequest requete = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override

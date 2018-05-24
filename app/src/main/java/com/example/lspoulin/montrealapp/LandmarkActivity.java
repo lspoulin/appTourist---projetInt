@@ -31,7 +31,7 @@ public class LandmarkActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landmark);
 
-        apiHelper = new ApiHelper();
+        apiHelper = new ApiHelper(getApplicationContext());
         Intent intent = getIntent();
         landmark = intent.getExtras().getParcelable(LANDMARK);
 
@@ -56,12 +56,6 @@ public class LandmarkActivity extends AppCompatActivity {
         description.setText(landmark.getDescription());
 
         Picasso.get().load(ApiManager.getPhotoURL(landmark.getImage())).into(imageView);
-
-
-        //DrawableManager.getInstance().setListener(imageView);
-        //Bitmap bitmap = DrawableManager.getInstance().getDrawable(landmark.getImage());
-        //Drawable imageDrawable = new BitmapDrawable(getResources(), bitmap);
-        //imageView.setImageDrawable(imageDrawable);
 
         if(!UserManager.getInstance().isLoggin()){
             liked.setVisibility(View.GONE);
@@ -114,7 +108,7 @@ public class LandmarkActivity extends AppCompatActivity {
     }
 
     private void landmarkUnliked(final int userid, final int landmarkid) {
-        apiHelper.landmarkUnliked(userid, landmarkid, this, new Callback() {
+        apiHelper.landmarkUnliked(userid, landmarkid, new Callback() {
             @Override
             public void methodToCallBack(Object object) {
 
@@ -123,7 +117,7 @@ public class LandmarkActivity extends AppCompatActivity {
     }
 
     private void landmarkLiked(final int userid, final int landmarkid) {
-        apiHelper.landmarkLiked(userid, landmarkid, this, new Callback() {
+        apiHelper.landmarkLiked(userid, landmarkid, new Callback() {
             @Override
             public void methodToCallBack(Object object) {
 

@@ -36,7 +36,7 @@ public class FavoriteActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite);
 
-        apiHelper = new ApiHelper();
+        apiHelper = new ApiHelper(getApplicationContext());
         landmarkList = new ArrayList<Landmark>();
 
         Bundle bundle= getIntent().getExtras();

@@ -79,8 +79,8 @@ public class PreferenceActivity extends AppCompatActivity {
 
     private void saveUserPreferences(final String preferences) {
         UserManager.getInstance().getUser().setPreferences(newPref);
-        ApiHelper apiHelper = new ApiHelper();
-        apiHelper.saveUser(this, new Callback() {
+        ApiHelper apiHelper = new ApiHelper(getApplicationContext());
+        apiHelper.saveUser( new Callback() {
             @Override
             public void methodToCallBack(Object object) {
 
